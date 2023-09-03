@@ -1,13 +1,13 @@
 #include <iostream>
-#include <string>
+#include <cstring>
 
 using namespace std;
 
 int main() {
-    string a = "Ana";
-    string b = "Leo";
+    char a[20] = "hola";
+    char b[20] = "pepe";
 
-    if (a < b) {
+    if (strcmp(a, b)<0) {
         cout << "a es menor que b" << endl;
     } else {
         cout << "a no es menor que b" << endl;

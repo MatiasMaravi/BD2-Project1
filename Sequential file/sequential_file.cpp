@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include <fstream>
 #include <vector>
 
@@ -13,6 +14,14 @@ struct Record {
     char archivo;
 
     void setData();
+    void setData(int id_, string name_, string surname_, int ciclo_) {
+        this->id = id_;
+        strcpy(this->name, name_.c_str());
+        strcpy(this->surname, surname_.c_str());
+        this->ciclo = ciclo_;
+        next = -1;
+        archivo = 'd';
+    }
 };
 
 void Record::setData() {
@@ -55,7 +64,7 @@ int SequentialFile<T>::size_datos() {
     fstream file(this->datos, ios::in | ios::binary);
     if (!file.is_open()) throw ("No se pudo abrir el archivo");
     file.seekg(0, ios::end);
-    int size = file.tellg();
+    long long size = file.tellg();
     file.close();
     return size / sizeof(Record);
 }
@@ -77,7 +86,7 @@ bool SequentialFile<T>::insert(Record record) {
 
     if(!file.is_open()) throw ("No se pudo abrir el archivo");
     
-    if(size() == 0){
+    if(size_datos() == 0){
         // separar en caso no funcione
         file.seekp(0, ios::end);
         file.write((char*)&record, sizeof(record));
@@ -85,11 +94,11 @@ bool SequentialFile<T>::insert(Record record) {
         return true;
     }
     else{
-        file.seekg(-sizeof(record), ios::end);
+        file.seekg(-(sizeof(record)), ios::end);
         Record last;
         file.read((char*)&last, sizeof(last));
     
-        if(record.name>last.name){
+        if(strcmp(record.name,last.name)>0){
             last.next = size_datos();
             file.seekp(-sizeof(record), ios::end);
             file.write((char*)&last, sizeof(last));
@@ -107,7 +116,7 @@ bool SequentialFile<T>::insert(Record record) {
             file.read((char*)&current, sizeof(current));
             int pos = 0;
 
-            while (record.name>current.name)
+            while (strcmp(record.name,current.name)>0)
             {
                 file.read((char*)&current, sizeof(current));
                 pos++;
@@ -156,7 +165,7 @@ bool SequentialFile<T>::insert(Record record) {
                     return true;
             
             }
-            fiel.close();
+            file.close();
         }
     }
 
@@ -265,4 +274,19 @@ vector<Record> SequentialFile<T>::range_search(T key1, T key2) {
         return result;
     }
 
+}
+
+
+
+int main() {
+    SequentialFile<int> file("datos.dat","auxiliar.dat");
+    Record record;
+    record.setData(1, "Juan", "Perez", 1);
+    file.insert(record);
+    record.setData(2, "Pedro", "Perez", 1);
+    file.insert(record);
+    record.setData(3, "Maria", "Perez", 1);
+    file.insert(record);
+
+    return 0;
 }
