@@ -34,6 +34,18 @@
             "externalConsole": false,
             "MIMode": "lldb",
             "preLaunchTask": "C/C++: gcc compilar archivo activo"
+        },
+        {
+            "name": "(lldb) Iniciar",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "Escriba el nombre del programa; por ejemplo, ${workspaceFolder}/a.out.",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
         }
     ]
 }
