@@ -68,7 +68,7 @@ private:
     int balancingfactor(long& pos_node,fstream& file);
     void leftrota(long& pos_node,fstream& file);
     void rightrota(long& pos_node,fstream& file);
-    int updatHeight(long& pos_node,fstream& file);
+    void updatHeight(Record father,long& pos_node,fstream& file);
 };
 
 AVLFile::AVLFile(string filename){
@@ -122,7 +122,7 @@ void AVLFile::inorder(long pos_node, vector<Record> &result, fstream &file){
         return;
 
     // Desplazar el cursor hacia la posicion deseada
-    file.seekg(pos_node, ios::beg);
+    file.seekg(pos_node * sizeof(Record), ios::beg);
 
     // Leyendo "record"
     Record record;
@@ -154,7 +154,7 @@ vector<Record> AVLFile::search(TK key) {
 
 template<typename TK>
 bool AVLFile::add(TK key) {
-    fstream file(this->filename,ios::app| ios::binary | ios::in | ios::out);
+    fstream file(this->filename, ios::binary | ios::in |ios::out);
     if (!file.is_open()) throw std::runtime_error("No se pudo abrir el archivo");
     bool flag = add(pos_root, key,file);
     file.close();
@@ -164,117 +164,209 @@ bool AVLFile::add(TK key) {
 bool AVLFile::add(long &pos_node, Record record,fstream& file) {
     if (pos_node == -1){
         file.seekp(0, ios::end);
-        pos_node = file.tellg();
-        record.height++;
+        pos_node = file.tellg() / sizeof(Record);
+        record.height = record.height+1;
         file.write((char*)&record, sizeof(record));
-        file.close();
         return true;
     }else{
-        fstream file(this->filename, ios::binary);
-        file.seekg(pos_node,ios::beg);
+        file.seekg(pos_node * sizeof(Record),ios::beg);
         Record father;
         file.read((char*)&father, sizeof(Record));
-        father.height++;
+        father.height = father.height +1;
+
         if(record.cod < father.cod){
             add(father.left, record,file);
+            file.seekp(pos_node * sizeof(Record), ios::beg);
+            file.write((char*)&father, sizeof(Record));
         }else if(record.cod > father.cod){
             add(father.right, record,file);
+            file.seekp(pos_node * sizeof(Record), ios::beg);
+            file.write((char*)&father, sizeof(Record));
         }
-        file.seekp(pos_node, ios::beg);
-        file.write((char*)&father, sizeof(Record));
-        file.close();
         balancefile(pos_node,father,file);
         return false;
     }
 }
 int AVLFile::Record_height(long& pos_node,fstream& file){
-    file.seekg(pos_node,ios::beg);
-    Record record;
-    file.read((char*)&record, sizeof(record));
-    int size= record.height;
-    file.close();
-    return size;
+    if (pos_node == -1) {
+        return -1;
+    }else{
+        file.seekg(pos_node * sizeof(Record),ios::beg);
+        Record record;
+        file.read((char*)&record, sizeof(record));
+        int size= record.height;
+        return size;
+    }
 }
 
 int AVLFile::balancingfactor(long& pos_node,fstream& file){
-    file.seekg(pos_node,ios::beg);
+    file.seekg(pos_node * sizeof(Record),ios::beg);
     Record record;
     file.read((char*)&record, sizeof(record));
     long pos_node_right = record.right;
     long pos_node_left = record.left;
-    file.close();
-    return Record_height(pos_node_right,file) - Record_height(pos_node_left,file);
+    return Record_height(pos_node_left,file) - Record_height(pos_node_right,file);
 };
 
 void AVLFile::balancefile(long &pos_node,Record father,fstream& file) {
+    //Record father innecesario
+    file.seekg( sizeof(Record) * pos_node,ios::beg);
+    Record parent;
+    file.read((char*)&parent, sizeof(Record));
     if(balancingfactor(pos_node,file) > 1){
-        if (balancingfactor(father.left,file) < 0){
-            leftrota(father.left,file);
+        if (balancingfactor(parent.left,file) < 0){
+            leftrota(parent.left,file);
         }
-        rightrota(father.right,file);
+        rightrota(pos_node,file);
     }else if (balancingfactor(pos_node,file) < -1){
-        if (balancingfactor(father.right,file) > 0){
-            rightrota(father.right,file);
+        if (balancingfactor(parent.right,file) > 0){
+            rightrota(parent.right,file);
         }
-        leftrota(father.left,file);
+        leftrota(pos_node,file);
     }
 }
 void AVLFile::leftrota(long& pos_node,fstream& file){
-    file.seekg(pos_node,ios::beg);
+    file.seekg(pos_node * sizeof(Record),ios::beg);
     Record record_father;
     file.read((char*)&record_father, sizeof(Record));
     long childleft = record_father.left;
     long childright = record_father.right;
-    file.seekg(childleft,ios::beg);
+    file.seekg(childleft * sizeof (Record),ios::beg);
     Record childLeft;
     file.read((char*)& childLeft, sizeof(Record));
     Record childRight;
-    file.seekg(childright,ios::beg);
+    file.seekg(childright * sizeof(Record),ios::beg);
     file.read((char*)& childRight, sizeof(Record));
 
     //Analizar esta parte
     int temp = childRight.left;
     childRight.left = record_father.right;
-    file.seekp(pos_node,ios::beg);
+    file.seekp(pos_node * sizeof(Record),ios::beg);
     file.write((char*)&childRight,sizeof(Record));
     int pos_right = record_father.right;
     record_father.right = temp;
-    file.seekp(pos_right,ios::beg);
+    file.seekp(pos_right * sizeof(Record),ios::beg);
     file.write((char*)&record_father, sizeof(Record));
-    updatHeight(pos_node,file);
-    updatHeight(childright,file);
+
+    updatHeight(record_father,childleft,file);
+    updatHeight(childRight,childright,file);
 }
 
 void AVLFile::rightrota(long& pos_node,fstream& file){
-    file.seekg(pos_node,ios::beg);
+    file.seekg(pos_node * sizeof(Record),ios::beg);
     Record record_father;
     file.read((char*)&record_father, sizeof(Record));
+
     long childleft = record_father.left;
     long childright = record_father.right;
-    file.seekg(childleft,ios::beg);
+
+    file.seekg(childleft * sizeof(Record),ios::beg);
     Record childLeft;
     file.read((char*)& childLeft, sizeof(Record));
+
     Record childRight;
-    file.seekg(childright,ios::beg);
+    file.seekg(childright * sizeof(Record),ios::beg);
     file.read((char*)& childRight, sizeof(Record));
-    //Implementar rotacion
+
+
     int temp = childLeft.right;
     childLeft.right = record_father.left;
-    file.seekp(pos_node,ios::beg);
+
+    //No escribe
+    file.seekp(pos_node * sizeof(Record),ios::beg);
     file.write((char*)&childLeft, sizeof(Record));
+
+
     int pos_left = record_father.left;
     record_father.left = temp;
-    file.seekp(pos_left,ios::beg);
+
+    file.seekp(pos_left * sizeof(Record),ios::beg);
     file.write((char*)&record_father, sizeof(Record));
-    updatHeight(pos_node,file);
-    updatHeight(childleft,file);
+
+    updatHeight(record_father, pos_node,file);
+    updatHeight(childLeft,childleft,file);
+
 }
-int AVLFile::updatHeight(long& pos_node,fstream& file){
-    return 0;
+void AVLFile::updatHeight(Record father,long& pos_node,fstream& file){
+
+    int child_pos_left = father.left;
+    int child_pos_right = father.right;
+
+    Record record_left;
+    file.seekg(child_pos_left * sizeof(Record),ios::beg);
+    file.read((char*)&record_left, sizeof(Record));
+
+    Record record_right;
+    file.seekg(child_pos_right * sizeof(Record),ios::beg);
+    file.read((char*)&record_right, sizeof(Record));
+
+    father.height = max(record_left.height, record_right.height) + 1;
+
+    file.seekp(pos_node * sizeof(Record),ios::beg);
+    file.write((char*)&father,sizeof(Record));
 }
 
 template<typename TK>
 bool AVLFile::remove(TK key) {
 
+    return 0;
+}
+
+void writeFile(){
+    AVLFile file("data.bin");
+    Record record;
+    int n = 0;
+    cout<<"Ingrese el numero de registros: ";cin>>n;
+    for (int i = 0; i < n; i++) {
+        record.setData();
+        file.add(record);
+    }
+    cout<<"Se guardo correctamente"<<endl;
+}
+
+void readFile(){
+    AVLFile file("data.bin");
+    cout<<"--------- Show all sorted data -----------\n";
+    vector<Record> result = file.inorder();
+    for(Record re : result) {
+        re.showData();
+    }
+}
+void ReadOne(){
+    AVLFile file("data.bin");
+    int key;
+    cout<<"Ingrese el codigo a buscar: ";cin>>key;
+    try{
+        Record record = file.find(key);
+        cout<<"\n--------- Show a data finded -----------\n";
+        record.showData();
+    }catch(exception e){
+        cout<<"Registro no encontrado"<<endl;
+    }
+}
+string menu(){
+    string op;
+    cout<<"\n--------- Menu -----------\n";
+    cout<<"1. Escribir en el archivo"<<endl;
+    cout<<"2. Leer todos los registros"<<endl;
+    cout<<"3. Buscar un registro"<<endl;
+    cout<<"4. Salir"<<endl;
+    cout<<"Ingrese una opcion: ";cin>>op;
+    return op;
+}
+void test(){
+    string op = menu();
+    if(op == "1") writeFile();
+    else if(op == "2") readFile();
+    else if(op == "3") ReadOne();
+    else if(op == "4") exit(0);
+    else cout<<"Opcion incorrecta"<<endl;
+
+}
+
+
+int main(){
+    //remove("data.bin");
+    test();
     return 0;
 }
