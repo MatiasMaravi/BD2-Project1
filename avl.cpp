@@ -68,7 +68,7 @@ private:
     int balancingfactor(long& pos_node,fstream& file);
     void leftrota(long& pos_node,fstream& file);
     void rightrota(long& pos_node,fstream& file);
-    void updatHeight(Record father,long& pos_node,fstream& file);
+    void updatHeight(long& pos_node,fstream& file);
 };
 
 AVLFile::AVLFile(string filename){
@@ -248,8 +248,10 @@ void AVLFile::leftrota(long& pos_node,fstream& file){
     file.seekp(pos_right * sizeof(Record),ios::beg);
     file.write((char*)&record_father, sizeof(Record));
 
-    updatHeight(record_father,childleft,file);
-    updatHeight(childRight,childright,file);
+    updatHeight(pos_node,file);
+    file.seekg(pos_node *sizeof (Record),ios::beg);
+    Record pos_node_Right;
+    updatHeight(pos_node_Right.right,file);
 }
 
 void AVLFile::rightrota(long& pos_node,fstream& file){
@@ -258,17 +260,10 @@ void AVLFile::rightrota(long& pos_node,fstream& file){
     file.read((char*)&record_father, sizeof(Record));
 
     long childleft = record_father.left;
-    long childright = record_father.right;
 
-    file.seekg(childleft * sizeof(Record),ios::beg);
     Record childLeft;
+    file.seekg(childleft * sizeof(Record),ios::beg);
     file.read((char*)& childLeft, sizeof(Record));
-
-    Record childRight;
-    file.seekg(childright * sizeof(Record),ios::beg);
-    file.read((char*)& childRight, sizeof(Record));
-
-
     int temp = childLeft.right;
     childLeft.right = record_father.left;
 
@@ -276,21 +271,26 @@ void AVLFile::rightrota(long& pos_node,fstream& file){
     file.seekp(pos_node * sizeof(Record),ios::beg);
     file.write((char*)&childLeft, sizeof(Record));
 
-
     int pos_left = record_father.left;
     record_father.left = temp;
 
     file.seekp(pos_left * sizeof(Record),ios::beg);
     file.write((char*)&record_father, sizeof(Record));
+    updatHeight(pos_node,file);
 
-    updatHeight(record_father, pos_node,file);
-    updatHeight(childLeft,childleft,file);
+    Record pos_node_Left;
+    file.seekg(pos_node *sizeof (Record),ios::beg);
+    file.read((char*)& pos_node_Left, sizeof(Record));
+    updatHeight(pos_node_Left.left,file);
 
 }
-void AVLFile::updatHeight(Record father,long& pos_node,fstream& file){
+void AVLFile::updatHeight(long& pos_node,fstream& file){
+    Record father;
+    file.seekg(pos_node * sizeof(Record),ios::beg);
+    file.read((char*)&father,sizeof(Record));
 
-    int child_pos_left = father.left;
-    int child_pos_right = father.right;
+    long child_pos_left = father.left;
+    long child_pos_right = father.right;
 
     Record record_left;
     file.seekg(child_pos_left * sizeof(Record),ios::beg);
