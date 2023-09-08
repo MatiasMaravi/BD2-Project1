@@ -33,6 +33,7 @@ void Record::showData(){
     cout << "\nCiclo : " << ciclo;
     cout << "\nleft : " << left;
     cout << "\nright : " << right <<endl;
+    cout << "\nheight : " << height <<endl;
 };
 
 class AVLFile {
@@ -107,7 +108,7 @@ void AVLFile::init_root(){
 Record AVLFile::find(long pos_node, int key, fstream &file){
     if (pos_node == -1) throw std::runtime_error("No se encontro el registro");
 
-    file.seekg(pos_node, ios::beg);
+    file.seekg(pos_node * sizeof(Record), ios::beg);
     Record record;
     file.read((char*) &record, sizeof(Record));
 
@@ -229,29 +230,31 @@ void AVLFile::leftrota(long& pos_node,fstream& file){
     file.seekg(pos_node * sizeof(Record),ios::beg);
     Record record_father;
     file.read((char*)&record_father, sizeof(Record));
-    long childleft = record_father.left;
+
     long childright = record_father.right;
-    file.seekg(childleft * sizeof (Record),ios::beg);
-    Record childLeft;
-    file.read((char*)& childLeft, sizeof(Record));
+
     Record childRight;
     file.seekg(childright * sizeof(Record),ios::beg);
     file.read((char*)& childRight, sizeof(Record));
 
-    //Analizar esta parte
     int temp = childRight.left;
     childRight.left = record_father.right;
+
     file.seekp(pos_node * sizeof(Record),ios::beg);
     file.write((char*)&childRight,sizeof(Record));
+
     int pos_right = record_father.right;
     record_father.right = temp;
+
     file.seekp(pos_right * sizeof(Record),ios::beg);
     file.write((char*)&record_father, sizeof(Record));
 
-    updatHeight(pos_node,file);
-    file.seekg(pos_node *sizeof (Record),ios::beg);
     Record pos_node_Right;
-    updatHeight(pos_node_Right.right,file);
+    file.seekg(pos_node *sizeof (Record),ios::beg);
+    file.read((char*)& pos_node_Right, sizeof(Record));
+    
+    updatHeight(pos_node_Right.left,file);
+    updatHeight(pos_node,file);
 }
 
 void AVLFile::rightrota(long& pos_node,fstream& file){
@@ -267,7 +270,6 @@ void AVLFile::rightrota(long& pos_node,fstream& file){
     int temp = childLeft.right;
     childLeft.right = record_father.left;
 
-    //No escribe
     file.seekp(pos_node * sizeof(Record),ios::beg);
     file.write((char*)&childLeft, sizeof(Record));
 
@@ -276,13 +278,13 @@ void AVLFile::rightrota(long& pos_node,fstream& file){
 
     file.seekp(pos_left * sizeof(Record),ios::beg);
     file.write((char*)&record_father, sizeof(Record));
-    updatHeight(pos_node,file);
 
     Record pos_node_Left;
-    file.seekg(pos_node *sizeof (Record),ios::beg);
+    file.seekg(pos_node * sizeof(Record),ios::beg);
     file.read((char*)& pos_node_Left, sizeof(Record));
-    updatHeight(pos_node_Left.left,file);
 
+    updatHeight(pos_node_Left.right,file);
+    updatHeight(pos_node,file);
 }
 void AVLFile::updatHeight(long& pos_node,fstream& file){
     Record father;
@@ -291,19 +293,29 @@ void AVLFile::updatHeight(long& pos_node,fstream& file){
 
     long child_pos_left = father.left;
     long child_pos_right = father.right;
+    
+    if (child_pos_left == -1 && child_pos_right == -1){
+        father.height = 0;
+        file.seekp(pos_node * sizeof(Record),ios::beg);
+        file.write((char*)&father,sizeof(Record));
+    }else{
+        Record record_left;
+        file.seekg(child_pos_left * sizeof(Record),ios::beg);
+        file.read((char*)&record_left, sizeof(Record));
 
-    Record record_left;
-    file.seekg(child_pos_left * sizeof(Record),ios::beg);
-    file.read((char*)&record_left, sizeof(Record));
-
-    Record record_right;
-    file.seekg(child_pos_right * sizeof(Record),ios::beg);
-    file.read((char*)&record_right, sizeof(Record));
-
-    father.height = max(record_left.height, record_right.height) + 1;
-
-    file.seekp(pos_node * sizeof(Record),ios::beg);
-    file.write((char*)&father,sizeof(Record));
+        Record record_right;
+        file.seekg(child_pos_right * sizeof(Record),ios::beg);
+        file.read((char*)&record_right, sizeof(Record));
+        if (record_left.left == -1 && record_left.right == -1){
+            record_left.height = 0;
+        }
+        if (record_right.left == -1 && record_right.right == -1){
+            record_right.height = 0;
+        }
+        father.height = max(record_left.height, record_right.height) + 1;
+        file.seekp(pos_node * sizeof(Record),ios::beg);
+        file.write((char*)&father,sizeof(Record));
+    }
 }
 
 template<typename TK>
@@ -361,12 +373,11 @@ void test(){
     else if(op == "3") ReadOne();
     else if(op == "4") exit(0);
     else cout<<"Opcion incorrecta"<<endl;
-
 }
 
 
 int main(){
-    //remove("data.bin");
+
     test();
     return 0;
 }
