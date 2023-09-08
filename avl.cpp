@@ -61,7 +61,7 @@ private:
     template <typename TK>
     vector<Record> search(long &pos_node,TK key);
     template <typename TK>
-    vector<Record> rangeSearch(long& pos_node, TK begin_key,TK end_key);
+    vector<Record> rangeSearch(fstream &file, TK begin_key,TK end_key,long& pos_node,vector<Record> &result);
     template<typename TK>
     bool remove(long& pos_node,TK key);
     void balancefile(long& pos_node,Record father,fstream& file);
@@ -137,12 +137,27 @@ void AVLFile::inorder(long pos_node, vector<Record> &result, fstream &file){
 
 template<typename TK>
 vector<Record> AVLFile::rangeSearch(TK begin_key, TK end_key) {
+    fstream file(this->filename, ios::binary | ios::in | ios::out);
+    if (!file.is_open()) throw std::runtime_error("No se pudo abrir el archivo");
     vector<Record> result;
-    while (begin_key++ != end_key){
-        Record record;
-        record = find(begin_key);
+    rangeSearch(file, begin_key, end_key, pos_root,result);
+    file.close();
+    return result;
+}
+template<typename TK>
+vector<Record> AVLFile::rangeSearch(fstream &file, TK begin_key, TK end_key ,long &pos_node, vector<Record> &result) {
+    Record record;   
+    file.seekg(pos_node * sizeof(Record), ios::beg);
+    file.read((char*)&record, sizeof(Record));
+    if (record.cod >= begin_key && record.cod <= end_key){
         result.push_back(record);
-    };
+    }
+    if (record.left != -1){
+        rangeSearch(file,begin_key,end_key,record.left,result);
+    }
+    if (record.right != -1){
+        rangeSearch(file,begin_key,end_key,record.right,result);
+    }
     return result;
 }
 
@@ -356,13 +371,25 @@ void ReadOne(){
         cout<<"Registro no encontrado"<<endl;
     }
 }
+void Readrange(){
+    AVLFile file("data.bin");
+    int begin_key,end_key;
+    cout<<"Ingrese el codigo de inicio: ";cin>>begin_key;
+    cout<<"Ingrese el codigo de fin: ";cin>>end_key;
+    vector<Record> result = file.rangeSearch(begin_key,end_key);
+    cout<<"\n--------- Show a data finded -----------\n";
+    for(Record re : result) {
+        re.showData();
+    };
+};
 string menu(){
     string op;
     cout<<"\n--------- Menu -----------\n";
     cout<<"1. Escribir en el archivo"<<endl;
     cout<<"2. Leer todos los registros"<<endl;
-    cout<<"3. Buscar un registro"<<endl;
-    cout<<"4. Salir"<<endl;
+    cout<<"3 Buscar un registro"<<endl;
+    cout<<"4 Busqueda en un rango"<<endl;
+    cout<<"5 Salir"<<endl;
     cout<<"Ingrese una opcion: ";cin>>op;
     return op;
 }
@@ -371,7 +398,8 @@ void test(){
     if(op == "1") writeFile();
     else if(op == "2") readFile();
     else if(op == "3") ReadOne();
-    else if(op == "4") exit(0);
+    else if(op == "4") Readrange();
+    else if(op == "5") exit(0);
     else cout<<"Opcion incorrecta"<<endl;
 }
 

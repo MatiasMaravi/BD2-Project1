@@ -23,6 +23,9 @@
         "*.bms": "hlasm",
         "*.rex": "rexx",
         "*.rexx": "rexx",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "iosfwd": "cpp",
+        "ios": "cpp",
+        "vector": "cpp"
     }
 }
