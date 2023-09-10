@@ -4,7 +4,20 @@
 #include <cmath>
 
 using namespace std;
+unsigned long long D = 3;
 
+unsigned long hash_int(int key){
+    return key%(1ULL<<D);
+}
+unsigned long hash_string(const std::string& str) {
+    unsigned long hash = 5381;
+    
+    for (char c : str) {
+        hash = ((hash << 5) + hash) + static_cast<unsigned char>(c);
+    }
+    
+    return hash_int(hash);
+}
 
 
 // #define fb 226//4084/18
@@ -81,7 +94,7 @@ class DynamicHash{
     string fileName;
     int M;//global depth(cantidad de buckets)
     int FB;//factor de bloqueo
-    unsigned long long D = 3;
+
     public:
     DynamicHash(string fileName, int fb = 226){
         this->fileName = fileName;
@@ -110,22 +123,13 @@ class DynamicHash{
     template<typename TK>
     Record search(TK key){
         string binary = to_binary(hash(key) );
+        Record temp;
+        return temp;
     }
-    template<typename TK>
-    int hash(TK key){
-        if(typeid(key) == typeid(int)) return key%(1ULL<<D);
-        else return hash_string(key)%(1ULL<<D);
-    }
+
 };
-unsigned long hash_string(const std::string& str) {
-    unsigned long hash = 5381;
-    
-    for (char c : str) {
-        hash = ((hash << 5) + hash) + static_cast<unsigned char>(c);
-    }
-    
-    return hash;
-}
+
+
 string to_binary(int n){
     vector <int> binary;
     string binary_string;
@@ -138,13 +142,4 @@ string to_binary(int n){
     }
     
     return binary_string;
-}
-
-int main(){
-    DynamicHash dh("data.bin");
-    
-    string binary = to_binary(dh.hash(6));
-    cout<<binary<<endl;
-    
-    return 0;
 }
