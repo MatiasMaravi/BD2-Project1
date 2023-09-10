@@ -26,6 +26,7 @@
         "ostream": "cpp",
         "iosfwd": "cpp",
         "ios": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "iostream": "cpp"
     }
 }

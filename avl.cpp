@@ -11,7 +11,7 @@ using namespace std;
 
 struct Record
 {
-    char cod[25];
+    int cod;
     char nombre[12];
     int ciclo;
     long left, right, height;
@@ -152,7 +152,7 @@ vector<Record> AVLFile::rangeSearch(TK begin_key, TK end_key) {
 }
 template<typename TK>
 vector<Record> AVLFile::rangeSearch(fstream &file, TK begin_key, TK end_key ,long &pos_node, vector<Record> &result) {
-    Record record;   
+    Record record;
     file.seekg(pos_node * sizeof(Record), ios::beg);
     file.read((char*)&record, sizeof(Record));
     if (record.cod >= begin_key && record.cod <= end_key){
@@ -205,8 +205,10 @@ bool AVLFile::add(long &pos_node, Record record,fstream& file) {
             file.seekp(pos_node * sizeof(Record), ios::beg);
             file.write((char*)&father, sizeof(Record));
         }
+        file.close();
+        fstream file(this->filename, ios::binary | ios::in |ios::out);
         balancefile(pos_node,file);
-        return false;
+        updatHeight(pos_node,file);
     }
 }
 int AVLFile::Record_height(long& pos_node,fstream& file){
@@ -231,8 +233,8 @@ int AVLFile::balancingfactor(long& pos_node,fstream& file){
 };
 
 void AVLFile::balancefile(long &pos_node,fstream& file) {
-    file.seekg( sizeof(Record) * pos_node,ios::beg);
     Record parent;
+    file.seekg( sizeof(Record) * pos_node,ios::beg);
     file.read((char*)&parent, sizeof(Record));
     if(balancingfactor(pos_node,file) > 1){
         if (balancingfactor(parent.left,file) < 0){
@@ -272,7 +274,7 @@ void AVLFile::leftrota(long& pos_node,fstream& file){
     Record pos_node_Right;
     file.seekg(pos_node *sizeof (Record),ios::beg);
     file.read((char*)& pos_node_Right, sizeof(Record));
-    
+
     updatHeight(pos_node_Right.left,file);
     updatHeight(pos_node,file);
 }
@@ -307,13 +309,15 @@ void AVLFile::rightrota(long& pos_node,fstream& file){
     updatHeight(pos_node,file);
 }
 void AVLFile::updatHeight(long& pos_node,fstream& file){
+
     Record father;
     file.seekg(pos_node * sizeof(Record),ios::beg);
     file.read((char*)&father,sizeof(Record));
 
+
     long child_pos_left = father.left;
     long child_pos_right = father.right;
-    
+
     if (child_pos_left == -1 && child_pos_right == -1){
         father.height = 0;
         file.seekp(pos_node * sizeof(Record),ios::beg);
@@ -322,16 +326,15 @@ void AVLFile::updatHeight(long& pos_node,fstream& file){
         Record record_left;
         file.seekg(child_pos_left * sizeof(Record),ios::beg);
         file.read((char*)&record_left, sizeof(Record));
-
+        if (child_pos_left == -1 || (record_left.left == -1 && record_left.right == -1)){
+            record_left.height = 0;
+        };
         Record record_right;
         file.seekg(child_pos_right * sizeof(Record),ios::beg);
         file.read((char*)&record_right, sizeof(Record));
-        if (record_left.left == -1 && record_left.right == -1){
-            record_left.height = 0;
-        }
-        if (record_right.left == -1 && record_right.right == -1){
+        if (child_pos_right ==-1 || (record_right.left == -1 && record_right.right == -1)){
             record_right.height = 0;
-        }
+        };
         father.height = max(record_left.height, record_right.height) + 1;
         file.seekp(pos_node * sizeof(Record),ios::beg);
         file.write((char*)&father,sizeof(Record));
@@ -352,7 +355,6 @@ bool AVLFile::remove(long& pos_node, TK& key, fstream& file) {
     if (pos_node == -1) {
         throw runtime_error("No hay elementos");
     }
-
     Record record;
     file.seekg(pos_node * sizeof(Record), ios::beg);
     file.read((char*)&record, sizeof(Record));
@@ -365,8 +367,11 @@ bool AVLFile::remove(long& pos_node, TK& key, fstream& file) {
         flag = remove(record.left, key, file);
     } else {
         if (record.left == -1 && record.right == -1) {
-            long fatherPo = searchFather(file,record.cod,pos_root);
+            int fatherPo = searchFather(file,record.cod,pos_root);
             Record RecordFather;
+            if (fatherPo == 0){
+                pos_root = -1;
+            }
             file.seekg(fatherPo * sizeof(Record), ios::beg);
             file.read((char*)&RecordFather, sizeof(Record));
             if (RecordFather.cod > record.cod) {
@@ -377,6 +382,7 @@ bool AVLFile::remove(long& pos_node, TK& key, fstream& file) {
             }
             file.seekp(fatherPo * sizeof(Record),ios::beg);
             file.write((char*)&RecordFather,sizeof(Record));
+
             flag = true;
         } else if (record.left == -1 || record.right == -1) {
             Record Child;
@@ -395,15 +401,11 @@ bool AVLFile::remove(long& pos_node, TK& key, fstream& file) {
             Record succesor;
             file.seekg(successorPos * sizeof(Record),ios::beg);
             file.read((char*)&succesor,sizeof(Record));
+            remove(successorPos,succesor.cod,file);
 
             succesor.left = record.left;
             succesor.right = record.right;
             succesor.height = record.height;
-
-            remove(succesorPos,succesor.cod,file);
-
-            file.seekp(posfather * sizeof(Record),ios::beg);
-            file.write((char*)&fatherSuccesor,sizeof(Record));
 
             file.seekp(pos_node * sizeof(Record), ios::beg);
             file.write((char*)&succesor,sizeof(Record));
@@ -412,7 +414,7 @@ bool AVLFile::remove(long& pos_node, TK& key, fstream& file) {
     }
     if (flag){
         updatHeight(pos_node,file);
-        balancefile(pos_node,file)
+        balancefile(pos_node,file);
     }
     return flag;
 }
@@ -433,16 +435,22 @@ long AVLFile::searchFather(fstream& file,TK& keyChild,long& pos_node){
     file.seekg(childRight * sizeof(Record),ios::beg);
     file.read((char*)&Childright,sizeof(Record));
 
+    long posFather= 0;
     if (keyChild == Childleft.cod || keyChild == Childright.cod){
-        return pos_node;
+        posFather =pos_node;
     }
 
-    if (father.cod >keyChild){
-        searchFather<TK>(file,keyChild, childleft);
-    }else if(father.cod < keyChild){
-        searchFather<TK>(file,keyChild,childRight);
-    }else {
-        throw std::runtime_error("No se encontro otro value");
+    if (posFather != 0){
+        return posFather;
+    }else{
+        if (father.cod > keyChild){
+            pos_node = searchFather<TK>(file,keyChild, childleft);
+        }else if(father.cod < keyChild){
+            pos_node = searchFather<TK>(file,keyChild,childRight);
+        }else {
+            throw std::runtime_error("No se encontro otro valor");
+        }
+        return pos_node;
     }
 }
 
@@ -479,7 +487,7 @@ void readFile(){
 }
 void ReadOne(){
     AVLFile file("data.bin");
-    char key[25];
+    int key;
     cout<<"Ingrese el codigo a buscar: ";cin>>key;
     try{
         Record record = file.find(key);
@@ -491,7 +499,7 @@ void ReadOne(){
 }
 void Readrange(){
     AVLFile file("data.bin");
-    char begin_key[25],end_key[25];
+    int begin_key,end_key;
     cout<<"Ingrese el codigo de inicio: ";cin>>begin_key;
     cout<<"Ingrese el codigo de fin: ";cin>>end_key;
     vector<Record> result = file.rangeSearch(begin_key,end_key);
@@ -500,6 +508,18 @@ void Readrange(){
         re.showData();
     };
 };
+
+void Delete(){
+  AVLFile file("data.bin");
+  int Key;
+  cout<<"Ingrese el codigo a borrar: "; cin>>Key;
+  bool flag = file.remove(Key);
+  if (flag){
+      cout<<"Eliminado con exito"<<endl;
+  }else{
+      cout<<"No se pudo eliminar"<<endl;
+  }
+};
 string menu(){
     string op;
     cout<<"\n--------- Menu -----------\n";
@@ -507,23 +527,27 @@ string menu(){
     cout<<"2. Leer todos los registros"<<endl;
     cout<<"3 Buscar un registro"<<endl;
     cout<<"4 Busqueda en un rango"<<endl;
-    cout<<"5 Salir"<<endl;
+    cout<<"5 Eliminar un registro"<<endl;
+    cout<<"6 Salir"<<endl;
     cout<<"Ingrese una opcion: ";cin>>op;
     return op;
 }
+
+
 void test(){
     string op = menu();
     if(op == "1") writeFile();
     else if(op == "2") readFile();
     else if(op == "3") ReadOne();
     else if(op == "4") Readrange();
-    else if(op == "5") exit(0);
+    else if(op == "5") Delete();
+    else if(op == "6") exit(0);
     else cout<<"Opcion incorrecta"<<endl;
 }
 
 
 int main(){
-
+    //remove("data.bin");
     test();
     return 0;
 }
