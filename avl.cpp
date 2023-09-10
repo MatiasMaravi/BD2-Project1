@@ -11,7 +11,7 @@ using namespace std;
 
 struct Record
 {
-    int cod;
+    char cod[25];
     char nombre[12];
     int ciclo;
     long left, right, height;
@@ -44,7 +44,8 @@ public:
 
     AVLFile(string filename);
     vector<Record> inorder();
-    Record find(int key);
+    template<class TK>
+    Record find(TK key);
     template<class TK>
     vector<Record> search(TK key);
     template<class TK>
@@ -55,7 +56,8 @@ public:
     bool remove(TK key);
 private:
     void init_root();
-    Record find(long pos_node, int key, fstream &file);
+    template <typename TK>
+    Record find(long pos_node, TK key, fstream &file);
     bool add(long &pos_node, Record record,fstream& file);
     void inorder(long pos_node, vector<Record> &result, fstream &file);
     template <typename TK>
@@ -63,21 +65,24 @@ private:
     template <typename TK>
     vector<Record> rangeSearch(fstream &file, TK begin_key,TK end_key,long& pos_node,vector<Record> &result);
     template<typename TK>
-    bool remove(long& pos_node,TK key);
-    void balancefile(long& pos_node,Record father,fstream& file);
+    bool remove(long& pos_node,TK& key,fstream& file);
+    void balancefile(long& pos_node,fstream& file);
     int Record_height(long& pos_node,fstream& file);
     int balancingfactor(long& pos_node,fstream& file);
     void leftrota(long& pos_node,fstream& file);
     void rightrota(long& pos_node,fstream& file);
     void updatHeight(long& pos_node,fstream& file);
+    template<class TK>
+    long searchFather(fstream& file,TK& keyChild,long& pos_node);
+    long maxleft(long& pos_node,fstream& file);
 };
 
 AVLFile::AVLFile(string filename){
     this->filename = filename;
     init_root();
 }
-
-Record AVLFile::find(int key){
+template<typename TK>
+Record AVLFile::find(TK key){
     fstream file(this->filename, ios::app | ios::binary | ios::in | ios::out);
     if (!file.is_open()) throw std::runtime_error("No se pudo abrir el archivo");
     Record record = find(pos_root,key,file);
@@ -105,7 +110,8 @@ void AVLFile::init_root(){
 
     file.close();
 }
-Record AVLFile::find(long pos_node, int key, fstream &file){
+template<typename TK>
+Record AVLFile::find(long pos_node, TK key, fstream &file){
     if (pos_node == -1) throw std::runtime_error("No se encontro el registro");
 
     file.seekg(pos_node * sizeof(Record), ios::beg);
@@ -199,7 +205,7 @@ bool AVLFile::add(long &pos_node, Record record,fstream& file) {
             file.seekp(pos_node * sizeof(Record), ios::beg);
             file.write((char*)&father, sizeof(Record));
         }
-        balancefile(pos_node,father,file);
+        balancefile(pos_node,file);
         return false;
     }
 }
@@ -224,8 +230,7 @@ int AVLFile::balancingfactor(long& pos_node,fstream& file){
     return Record_height(pos_node_left,file) - Record_height(pos_node_right,file);
 };
 
-void AVLFile::balancefile(long &pos_node,Record father,fstream& file) {
-    //Record father innecesario
+void AVLFile::balancefile(long &pos_node,fstream& file) {
     file.seekg( sizeof(Record) * pos_node,ios::beg);
     Record parent;
     file.read((char*)&parent, sizeof(Record));
@@ -335,10 +340,123 @@ void AVLFile::updatHeight(long& pos_node,fstream& file){
 
 template<typename TK>
 bool AVLFile::remove(TK key) {
-
-    return 0;
+    fstream file(this->filename, ios::binary | ios::in |ios::out);
+    if (!file.is_open()) throw std::runtime_error("No se pudo abrir el archivo");
+    bool flag = remove(pos_root, key,file);
+    file.close();
+    return flag;
 }
 
+template<typename TK>
+bool AVLFile::remove(long& pos_node, TK& key, fstream& file) {
+    if (pos_node == -1) {
+        throw runtime_error("No hay elementos");
+    }
+
+    Record record;
+    file.seekg(pos_node * sizeof(Record), ios::beg);
+    file.read((char*)&record, sizeof(Record));
+
+    bool flag = false;
+
+    if (record.cod < key) {
+        flag = remove(record.right, key, file);
+    } else if (record.cod > key) {
+        flag = remove(record.left, key, file);
+    } else {
+        if (record.left == -1 && record.right == -1) {
+            long fatherPo = searchFather(file,record.cod,pos_root);
+            Record RecordFather;
+            file.seekg(fatherPo * sizeof(Record), ios::beg);
+            file.read((char*)&RecordFather, sizeof(Record));
+            if (RecordFather.cod > record.cod) {
+                RecordFather.left = -1;
+
+            }else{
+                RecordFather.right = -1;
+            }
+            file.seekp(fatherPo * sizeof(Record),ios::beg);
+            file.write((char*)&RecordFather,sizeof(Record));
+            flag = true;
+        } else if (record.left == -1 || record.right == -1) {
+            Record Child;
+            if ( record.left == -1) {
+                file.seekg(record.right *sizeof(Record),ios::beg);
+                file.read((char*)& Child,sizeof(Record));
+            }else if (record.right == -1){
+                file.seekg(record.left *sizeof(Record),ios::beg);
+                file.read((char*)& Child,sizeof(Record));
+            }
+            file.seekp(pos_node * sizeof(Record),ios::beg);
+            file.write((char*)&Child,sizeof(Record));
+            flag = true;
+        } else {
+            long successorPos = maxleft(record.left, file);
+            Record succesor;
+            file.seekg(successorPos * sizeof(Record),ios::beg);
+            file.read((char*)&succesor,sizeof(Record));
+
+            succesor.left = record.left;
+            succesor.right = record.right;
+            succesor.height = record.height;
+
+            remove(succesorPos,succesor.cod,file);
+
+            file.seekp(posfather * sizeof(Record),ios::beg);
+            file.write((char*)&fatherSuccesor,sizeof(Record));
+
+            file.seekp(pos_node * sizeof(Record), ios::beg);
+            file.write((char*)&succesor,sizeof(Record));
+            flag = true;
+        }
+    }
+    if (flag){
+        updatHeight(pos_node,file);
+        balancefile(pos_node,file)
+    }
+    return flag;
+}
+template <typename TK>
+long AVLFile::searchFather(fstream& file,TK& keyChild,long& pos_node){
+    Record father;
+    file.seekg(pos_node * sizeof(Record),ios::beg);
+    file.read((char*)&father,sizeof(Record));
+
+    long childleft = father.left;
+    long childRight = father.right;
+
+    Record Childleft;
+    file.seekg(childleft * sizeof(Record),ios::beg);
+    file.read((char*)&Childleft,sizeof(Record));
+
+    Record Childright;
+    file.seekg(childRight * sizeof(Record),ios::beg);
+    file.read((char*)&Childright,sizeof(Record));
+
+    if (keyChild == Childleft.cod || keyChild == Childright.cod){
+        return pos_node;
+    }
+
+    if (father.cod >keyChild){
+        searchFather<TK>(file,keyChild, childleft);
+    }else if(father.cod < keyChild){
+        searchFather<TK>(file,keyChild,childRight);
+    }else {
+        throw std::runtime_error("No se encontro otro value");
+    }
+}
+
+long AVLFile::maxleft(long& pos_node, std::fstream &file) {
+    Record record;
+    file.seekg(pos_node * sizeof(Record),ios::beg);
+    file.read((char*)&record,sizeof(Record));
+    if (record.right == -1){
+        return  pos_node;
+    }else{
+        maxleft(record.right,file);
+    }
+    return -1;
+}
 void writeFile(){
     AVLFile file("data.bin");
     Record record;
@@ -361,7 +479,7 @@ void readFile(){
 }
 void ReadOne(){
     AVLFile file("data.bin");
-    int key;
+    char key[25];
     cout<<"Ingrese el codigo a buscar: ";cin>>key;
     try{
         Record record = file.find(key);
@@ -373,7 +491,7 @@ void ReadOne(){
 }
 void Readrange(){
     AVLFile file("data.bin");
-    int begin_key,end_key;
+    char begin_key[25],end_key[25];
     cout<<"Ingrese el codigo de inicio: ";cin>>begin_key;
     cout<<"Ingrese el codigo de fin: ";cin>>end_key;
     vector<Record> result = file.rangeSearch(begin_key,end_key);
