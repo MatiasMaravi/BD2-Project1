@@ -126,21 +126,7 @@ class DynamicHash{
         Record temp;
         return temp;
     }
-    unsigned long hash_string(const std::string& str) {
-    unsigned long hash = 5381;
-    
-    for (char c : str) {
-        hash = ((hash << 5) + hash) + static_cast<unsigned char>(c);
-    }
-    
-    return hash;
-    }
 
-    template<typename TK>
-    int hash(TK key){
-        if(typeid(key) == typeid(int)) return key%(1ULL<<D);
-        else return hash_string(key)%(1ULL<<D);
-    }
 };
 
 
@@ -156,14 +142,4 @@ string to_binary(int n){
     }
     
     return binary_string;
-}
-
-int main(){
-    DynamicHash dh("data.bin");
-    
-    int n = 6;
-    string binary = to_binary(dh.hash(6));
-    cout<<binary<<endl;
-    
-    return 0;
 }
