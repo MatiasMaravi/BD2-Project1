@@ -1,16 +1,12 @@
 #include <iostream>
-#include "Parser/Scanner.hpp"
+#include "Parser/Parser.hpp"
 using namespace std;
 
 int main(){
     // string s;
     // cin>>s;
-    Scanner* scanner = new Scanner("select * from Customer where DNI = 7279");
-    Token* tok = scanner->nextToken();
-    do{
-        cout<<tok<<endl;
-        tok = scanner->nextToken();
-    }while(tok->type != Token::END);
-
+    Scanner scanner("create table Customer from file \"C:\\data.csv\" using index avl(\"DNI\")");
+    Parser parser(&scanner);
+    parser.parse();
     return 0;
 }
