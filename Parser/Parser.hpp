@@ -87,8 +87,36 @@ bool Parser::parse_select(){
     if(!match(Token::ID)) return false;
     string table_name = previous->lexema;
     if(!match(Token::WHERE)) return false;
+    if(!match(Token::ID)) return false;
+    string key_table = previous->lexema;
+    if(!match(Token::EQUAL) && !match(Token::BETWEEN)) return false;
+    if(previous->type == Token::EQUAL){
+        if(!match(Token::ID) && !match(Token::NUMBER)) return false;
+            Token* value = previous;
+            if(value->type == Token::NUMBER){
+                int number = stoi(value->lexema);
+                cout<<"Buscando en la tabla donde "<<key_table<<" = "<<number<<endl;
+            }else{
+                string cadena = value->lexema;
+                cout<<"Buscando en la tabla donde "<<key_table<<" = "<<cadena<<endl;
+            }
+    }else{
+        if(!match(Token::NUMBER) && !match(Token::ID)) return false;
+        Token value1 = *previous;
+        if(!match(Token::AND)) return false;
+        if(value1.type!=current->type) return false;
+        if(value1.type == Token::NUMBER){
+            int number1 = stoi(value1.lexema);
+            int number2 = stoi(current->lexema);
+            cout<<"Buscando en la tabla donde "<<key_table<<" entre "<<number1<<" y "<<number2<<endl;
+        }else{
+            string cadena1 = value1.lexema;
+            string cadena2 = current->lexema;
+            cout<<"Buscando en la tabla donde "<<key_table<<" entre "<<cadena1<<" y "<<cadena2<<endl;
+        }
+    }
+    return true;
 }
-
 void Parser::parse(){
     current = scanner->nextToken();
     if (check(Token::ERR)) {
@@ -99,5 +127,7 @@ void Parser::parse(){
         parse_create_table();
     }else if(check(Token::SELECT)){
         parse_select();
-}
+    }else{
+        cout<<"Error"<<endl;
+    }
 }
