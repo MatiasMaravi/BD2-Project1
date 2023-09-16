@@ -1,0 +1,51 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "C/C++ Runner: Debug Session",
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "/Users/leoisidro/Library/CloudStorage/OneDrive-UNIVERSIDADDEINGENIERIAYTECNOLOGIA/UTEC_MAC/BASE DE DATOS/proyecto/BD2-Project1/Sequential file",
+            "program": "/Users/leoisidro/Library/CloudStorage/OneDrive-UNIVERSIDADDEINGENIERIAYTECNOLOGIA/UTEC_MAC/BASE DE DATOS/proyecto/BD2-Project1/Sequential file/build/Debug/outDebug"
+        },
+        {
+            "name": "C/C++: g++ Compilar y depurar el archivo activo",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/${fileBasenameNoExtension}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "C/C++: g++ compilar archivo activo"
+        },
+        {
+            "name": "C/C++: gcc Compilar y depurar el archivo activo",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/${fileBasenameNoExtension}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "C/C++: gcc compilar archivo activo"
+        },
+        {
+            "name": "(lldb) Iniciar",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "Escriba el nombre del programa; por ejemplo, ${workspaceFolder}/a.out.",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        }
+    ]
+}
