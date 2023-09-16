@@ -19,9 +19,11 @@ public:
     Parser(Scanner* scanner):scanner(scanner){
         previous = current = nullptr;
     }
-    void parse();
+    bool parse();
     bool parse_create_table();
     bool parse_select();
+    bool parse_insert();
+    bool parse_delete();
 };
 // match and consume next token
 bool Parser::match(Token::Type ttype) {
@@ -66,16 +68,17 @@ bool Parser::parse_create_table(){
     if(!match(Token::HASH) && !match(Token::AVL) && !match(Token::SEQUENTIAL)) return false;
     Token::Type index_type = previous->type;
     if(!match(Token::LPAREN)) return false;
-    if(!match(Token::STRING)) return false;
+    if(!match(Token::STRING) && !match(Token::ID)) return false;
     string key_table = previous->lexema;
     if(!match(Token::RPAREN)) return false;
 
     if(index_type == Token::HASH)
-        cout<<"Creando indice Hash"<<endl;
-    else if(index_type == Token::AVL)
-        cout<<"Creando indice AVL"<<endl;
+        cout<<"Creando indice Hash con key "<<key_table<<endl;
+    else if(index_type == Token::AVL){
+        cout<<"Creando indice AVL con key "<<key_table<<endl;
+        cout<<"Ruta: "<<filename<<endl;}
     else if(index_type == Token::SEQUENTIAL)
-        cout<<"Creando indice Secuencial"<<endl;
+        cout<<"Creando indice Secuencial con key "<<key_table<<endl;
     else
         cout<<"Error"<<endl;
     return true;
@@ -117,17 +120,53 @@ bool Parser::parse_select(){
     }
     return true;
 }
-void Parser::parse(){
+bool Parser::parse_insert(){
+    if(!match(Token::INSERT)) return false;
+    if(!match(Token::INTO)) return false;
+    if(!match(Token::ID)) return false;
+    string table_name = previous->lexema;
+    if(!match(Token::VALUES)) return false;
+    if(!match(Token::LPAREN)) return false;
+    if(!match(Token::VALUEPAREN)) return false;
+    string values = previous->lexema;
+    if(!match(Token::RPAREN)) return false;
+    return true;
+}
+bool Parser::parse_delete(){
+    if(!match(Token::DELETE)) return false;
+    if(!match(Token::FROM)) return false;
+    if(!match(Token::ID)) return false;
+    string table_name = previous->lexema;
+    if(!match(Token::WHERE)) return false;
+    if(!match(Token::ID)) return false;
+    string key_table = previous->lexema;
+    if(!match(Token::EQUAL)) return false;
+    if(!match(Token::ID) && !match(Token::NUMBER)) return false;
+    Token value = *previous;
+    if(value.type == Token::NUMBER){
+        int number = stoi(value.lexema);
+        cout<<"Eliminando en la tabla donde "<<key_table<<" = "<<number<<endl;
+    }else{
+        string cadena = value.lexema;
+        cout<<"Eliminando en la tabla donde "<<key_table<<" = "<<cadena<<endl;
+    }
+    return true;
+}
+bool Parser::parse(){
     current = scanner->nextToken();
     if (check(Token::ERR)) {
         cout << "Error en scanner - caracter invalido" << endl;
         exit(0);
     }
     if(check(Token::CREATE)){
-        parse_create_table();
+        return parse_create_table();
     }else if(check(Token::SELECT)){
-        parse_select();
+        return parse_select();
+    }else if (check(Token::INSERT)) {
+        return parse_insert();
+    }else if (check(Token::DELETE)) {
+        return parse_delete();
     }else{
-        cout<<"Error"<<endl;
+        return false;
     }
 }

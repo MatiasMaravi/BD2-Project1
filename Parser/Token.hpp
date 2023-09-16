@@ -14,10 +14,10 @@ struct Token{
                 BETWEEN, AND,
                 STRING, NUMBER, 
                 EQUAL, ID,
-                LPAREN, RPAREN, 
+                LPAREN, RPAREN, VALUEPAREN,
                 END, ERR};
     Type type;
-    static const char* token_names[24];
+    static const char* token_names[25];
     string lexema;
     Token(Type): type(type){
         lexema = "";
@@ -25,7 +25,7 @@ struct Token{
     Token(Type type, const string lexema): type(type), lexema(lexema){}
 };
 
-const char* Token::token_names[24] = {"select", "*", 
+const char* Token::token_names[25] = {"select", "*", 
                                         "from", "table", 
                                         "where", "create", 
                                         "insert", "delete", 
@@ -36,7 +36,7 @@ const char* Token::token_names[24] = {"select", "*",
                                         "between", "and",
                                         "string", "number", 
                                         "=","ID",
-                                        "(", ")",};
+                                        "(", ")","ValueParen"};
 
 
 std::ostream& operator << ( std::ostream& outs, const Token & tok ){

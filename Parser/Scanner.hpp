@@ -4,6 +4,7 @@ class Scanner{
 public:
     Scanner(const char* input);
     Token* nextToken();
+    bool paren_flag = false;
 private:
     unordered_map<string, Token::Type> reserved;
     string input;
@@ -11,6 +12,12 @@ private:
     char nextChar();
     void rollBack();
     void startLexema();
+    void consume_white_spaces(char &c);
+    Token* scan_number(char &c);
+    Token* scan_alpha(char &c);
+    Token* scan_string(char &c);
+    Token* scan_lparen(char &c);
+    Token* scan_valueparen(char &c);
     Token::Type checkReserved(string lexema);
     string getLexema();
 };
@@ -53,37 +60,55 @@ return;
 string Scanner::getLexema() {
     return input.substr(first,current-first);
 }
-Token* Scanner::nextToken(){
-    Token* tok;
+void Scanner::consume_white_spaces(char &c){
+    while(c == ' ' || c == '\n' || c == '\t') c = nextChar();
+}
+Token* Scanner::scan_number(char &c){
+    c = nextChar();
+    while(isdigit(c)) c = nextChar();
+    rollBack();
+    return new Token(Token::NUMBER, getLexema());
+}
+Token* Scanner::scan_alpha(char &c){
+    c = nextChar();
+    while(isalpha(c)) c = nextChar();
+    rollBack();
+    return new Token(checkReserved(getLexema()), getLexema());
+}
+Token* Scanner::scan_string(char &c){
+    c = nextChar();
+    while(c != '"') c = nextChar();
+    return new Token(Token::STRING, getLexema());
+}
+Token* Scanner::scan_lparen(char &c){
+    paren_flag = true;
+    return new Token(Token::LPAREN, "(");
+}
+Token* Scanner::scan_valueparen(char &c){
+    while(c != ')') c = nextChar();
+    paren_flag = false;
+    rollBack();
+    return new Token(Token::VALUEPAREN, getLexema());
+}
+ Token* Scanner::nextToken(){
     char c;
     //consume white spaces
     c = nextChar();
-    while(c == ' ' || c == '\n' || c == '\t') c = nextChar();
+    consume_white_spaces(c);
     if(c == '\0' || c == '-') return new Token(Token::END,"-");
+
     startLexema();
-    if(c == '"'){
-        c = nextChar();
-        while(c != '"') c = nextChar();
-        return new Token(Token::STRING, getLexema());
-    }
-    else if(isalpha(c)){
-        c = nextChar();
-        while(isalpha(c)) c = nextChar();
-        rollBack();
-        tok = new Token(checkReserved(getLexema()), getLexema());
-        return tok;
-    }else if(c == '*' ) return new Token(Token::ALL, "*");
+
+    if(paren_flag) return scan_valueparen(c);
+    else if(c == '"') return scan_string(c);
+    else if(c == '(') return scan_lparen(c);
+    else if(isalpha(c)) return scan_alpha(c);
+    else if(c == '*' ) return new Token(Token::ALL, "*");
     else if(c == '=') return new Token(Token::EQUAL, "=");
-    else if(c == '(') return new Token(Token::LPAREN, "(");
     else if(c == ')') return new Token(Token::RPAREN, ")");
-    else if(isdigit(c)){
-        c = nextChar();
-        while(isdigit(c)) c = nextChar();
-        rollBack();
-        return new Token(Token::NUMBER, getLexema());
-    }else{
-        return new Token(Token::ERR, "Error");
-    }
+    else if(isdigit(c)) return scan_number(c);
+    else return new Token(Token::ERR, "Error");
+    
 }
 char Scanner::nextChar() {
     int c = input[current];
