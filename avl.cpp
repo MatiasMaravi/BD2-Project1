@@ -369,7 +369,7 @@ bool AVLFile::remove(long& pos_node, TK& key, fstream& file) {
         if (record.left == -1 && record.right == -1) {
             int fatherPo = searchFather(file,record.cod,pos_root);
             Record RecordFather;
-            if (fatherPo == 0){
+            if (fatherPo == 0 && pos_node == 0){
                 pos_root = -1;
             }
             file.seekg(fatherPo * sizeof(Record), ios::beg);
@@ -403,10 +403,13 @@ bool AVLFile::remove(long& pos_node, TK& key, fstream& file) {
             file.read((char*)&succesor,sizeof(Record));
             remove(successorPos,succesor.cod,file);
 
-            succesor.left = record.left;
             succesor.right = record.right;
             succesor.height = record.height;
+            succesor.left = record.left;
 
+            if (record.left == successorPos){
+                succesor.left = -1;
+            }
             file.seekp(pos_node * sizeof(Record), ios::beg);
             file.write((char*)&succesor,sizeof(Record));
             flag = true;
@@ -435,18 +438,18 @@ long AVLFile::searchFather(fstream& file,TK& keyChild,long& pos_node){
     file.seekg(childRight * sizeof(Record),ios::beg);
     file.read((char*)&Childright,sizeof(Record));
 
-    long posFather= 0;
+    long posFather= -1;
     if (keyChild == Childleft.cod || keyChild == Childright.cod){
         posFather =pos_node;
     }
 
-    if (posFather != 0){
+    if (posFather != -1){
         return posFather;
     }else{
         if (father.cod > keyChild){
-            pos_node = searchFather<TK>(file,keyChild, childleft);
+            searchFather<TK>(file,keyChild, childleft);
         }else if(father.cod < keyChild){
-            pos_node = searchFather<TK>(file,keyChild,childRight);
+            searchFather<TK>(file,keyChild,childRight);
         }else {
             throw std::runtime_error("No se encontro otro valor");
         }
@@ -510,15 +513,15 @@ void Readrange(){
 };
 
 void Delete(){
-  AVLFile file("data.bin");
-  int Key;
-  cout<<"Ingrese el codigo a borrar: "; cin>>Key;
-  bool flag = file.remove(Key);
-  if (flag){
-      cout<<"Eliminado con exito"<<endl;
-  }else{
-      cout<<"No se pudo eliminar"<<endl;
-  }
+    AVLFile file("data.bin");
+    int Key;
+    cout<<"Ingrese el codigo a borrar: "; cin>>Key;
+    bool flag = file.remove(Key);
+    if (flag){
+        cout<<"Eliminado con exito"<<endl;
+    }else{
+        cout<<"No se pudo eliminar"<<endl;
+    }
 };
 string menu(){
     string op;
@@ -547,7 +550,6 @@ void test(){
 
 
 int main(){
-    //remove("data.bin");
     test();
     return 0;
 }
