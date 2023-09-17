@@ -1,0 +1,6 @@
+# ninja log v5
+0	57	1694920756108530818	build.ninja	eb2f20925b33e8de
+1	652	1694920847190867163	CMakeFiles/BD2_Project1.dir/interfaz/interfaz_main.cpp.o	530c895c7b518361
+1	715	1694920847254947292	CMakeFiles/BD2_Project1.dir/main.cpp.o	43188b5a7a1fbff1
+4	560	1694920966628976907	CMakeFiles/BD2_Project1.dir/interfaz/interfaz_main.cpp.o	530c895c7b518361
+3	645	1694920966714631970	CMakeFiles/BD2_Project1.dir/main.cpp.o	43188b5a7a1fbff1
