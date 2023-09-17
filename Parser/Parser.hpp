@@ -7,7 +7,11 @@ Sentences:
 - delete from Customer where DNI = x
 
 */
+
 #include "Scanner.hpp"
+#include "../sequential_file.hpp"
+
+
 class Parser{
     Scanner* scanner;
     Token* current, *previous;
@@ -54,6 +58,50 @@ bool Parser::advance() {
 bool Parser::isAtEnd() {
     return (current->type == Token::END);
 }
+
+void leer_record(string line, Record &record){
+    stringstream ss(line);
+    string campo;
+    getline(ss, campo, ',');
+    int id = stoi(campo);
+    getline(ss, campo, ',');
+    string name = campo;
+    getline(ss, campo, ',');
+    string surname = campo;
+    getline(ss, campo, ',');
+    int ciclo = stoi(campo);
+    record.setData(id, name, surname, ciclo);
+}
+void create_sequential(string key_table, string table_name, ifstream &file_){
+    cout<<"Creando indice secuencial con key "<<key_table<<endl;
+    SequentialFile<string> file(table_name + ".dat", "auxiliar.dat");
+    Record record;
+    string campo, line;
+    while(getline(file_, line)){
+        leer_record(line, record);
+        file.insert(record);
+    }
+    file_.close();
+}
+void leer_csv(string table_name, string filename, Token::Type index_type, string key_table){
+    ifstream file_(filename);
+    string line;
+    getline(file_, line);
+
+    if(index_type == Token::SEQUENTIAL){
+        create_sequential(key_table, table_name, file_);
+    }
+    // else if(index_type == Token::AVL){
+    //     cout<<"Creando indice AVL con key "<<key_table<<endl;
+    //     cout<<"Ruta: "<<filename<<endl;}
+    // else if(index_type == Token::HASH)
+    //     cout<<"Creando indice hash con key "<<key_table<<endl;
+    else
+        cout<<"Error"<<endl;
+
+
+}
+
 bool Parser::parse_create_table(){
     if(!match(Token::CREATE)) return false;
     if(!match(Token::TABLE)) return false;
@@ -68,19 +116,10 @@ bool Parser::parse_create_table(){
     if(!match(Token::HASH) && !match(Token::AVL) && !match(Token::SEQUENTIAL)) return false;
     Token::Type index_type = previous->type;
     if(!match(Token::LPAREN)) return false;
-    if(!match(Token::STRING) && !match(Token::ID)) return false;
+    if(!match(Token::VALUEPAREN)) return false; // match(Token::ID) && match(Token::STRING)
     string key_table = previous->lexema;
     if(!match(Token::RPAREN)) return false;
-
-    if(index_type == Token::HASH)
-        cout<<"Creando indice Hash con key "<<key_table<<endl;
-    else if(index_type == Token::AVL){
-        cout<<"Creando indice AVL con key "<<key_table<<endl;
-        cout<<"Ruta: "<<filename<<endl;}
-    else if(index_type == Token::SEQUENTIAL)
-        cout<<"Creando indice Secuencial con key "<<key_table<<endl;
-    else
-        cout<<"Error"<<endl;
+    leer_csv(table_name, filename, index_type, key_table);
     return true;
 }
 bool Parser::parse_select(){

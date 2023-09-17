@@ -78,7 +78,7 @@ Token* Scanner::scan_alpha(char &c){
 Token* Scanner::scan_string(char &c){
     c = nextChar();
     while(c != '"') c = nextChar();
-    return new Token(Token::STRING, getLexema());
+    return new Token(Token::STRING, getLexema().substr(1,getLexema().size()-2));
 }
 Token* Scanner::scan_lparen(char &c){
     paren_flag = true;
