@@ -58,8 +58,8 @@ bool Parser::advance() {
 bool Parser::isAtEnd() {
     return (current->type == Token::END);
 }
-
-void leer_record(string line, Record &record){
+template <typename T>
+void leer_record(string line, Record<T> &record, string key_table){
     stringstream ss(line);
     string campo;
     getline(ss, campo, ',');
@@ -71,17 +71,35 @@ void leer_record(string line, Record &record){
     getline(ss, campo, ',');
     int ciclo = stoi(campo);
     record.setData(id, name, surname, ciclo);
+    if(key_table == "id") record.set_key_int(id);
+    else if(key_table == "name") record.set_key_string(name);
+    else if(key_table == "surname") record.set_key_string(surname);
+    else record.set_key_int(ciclo);
+    
 }
+template <typename T>
 void create_sequential(string key_table, string table_name, ifstream &file_){
     cout<<"Creando indice secuencial con key "<<key_table<<endl;
-    SequentialFile<string> file(table_name + ".dat", "auxiliar.dat");
-    Record record;
+
+    SequentialFile<T> file(table_name + ".dat", "auxiliar.dat");
+    Record<T> record;
     string campo, line;
     while(getline(file_, line)){
-        leer_record(line, record);
+        leer_record(line, record, key_table);
         file.insert(record);
     }
     file_.close();
+}
+template <typename T>
+void search_sequential(string key_table, string table_name, T cadena){
+    cout<<"Buscando en la tabla "<<table_name<<" con key "<<key_table<< " donde "<<key_table<<" = "<<cadena<<endl;
+    SequentialFile<T> file(table_name + ".dat", "auxiliar.dat");
+    Record<T>* record = file.search(cadena);
+    if(record){
+        record->showData();
+    }else{
+        cout<<"No existe este registro"<<endl;
+    }
 }
 void leer_csv(string table_name, string filename, Token::Type index_type, string key_table){
     ifstream file_(filename);
@@ -89,7 +107,8 @@ void leer_csv(string table_name, string filename, Token::Type index_type, string
     getline(file_, line);
 
     if(index_type == Token::SEQUENTIAL){
-        create_sequential(key_table, table_name, file_);
+        if(key_table == "id" || key_table == "ciclo") create_sequential<int>(key_table, table_name, file_);
+        else create_sequential<string>(key_table, table_name, file_);
     }
     // else if(index_type == Token::AVL){
     //     cout<<"Creando indice AVL con key "<<key_table<<endl;
@@ -136,11 +155,11 @@ bool Parser::parse_select(){
         if(!match(Token::ID) && !match(Token::NUMBER)) return false;
             Token* value = previous;
             if(value->type == Token::NUMBER){
+                //Por el momento no es posible porque el key es name(string)
                 int number = stoi(value->lexema);
-                cout<<"Buscando en la tabla donde "<<key_table<<" = "<<number<<endl;
+                search_sequential(key_table, table_name, number);
             }else{
-                string cadena = value->lexema;
-                cout<<"Buscando en la tabla donde "<<key_table<<" = "<<cadena<<endl;
+                search_sequential(key_table, table_name, value->lexema);
             }
     }else{
         if(!match(Token::NUMBER) && !match(Token::ID)) return false;

@@ -9,15 +9,15 @@ bool key_exist(string key, string line){
     if(pos == string::npos) return false;
     return true;
 }
-
+template <typename T>
 void print_datos_sequential(string data_file){
     cout << data_file << endl;
     fstream file1(data_file, ios::app | ios::in | ios::binary);
-    Record cabecera;
+    Record<T> cabecera;
     file1.seekg(0, ios::beg);
     file1.read((char *)&cabecera, sizeof(cabecera));
     cout << cabecera.next << " " << cabecera.archivo << endl;
-    Record current;
+    Record<T> current;
     file1.read((char *)&current, sizeof(current));
     while (!file1.eof()) {
         cout << current.id << " " << current.name << " " << current.surname << " " << current.ciclo << " " << current.next << " " << current.archivo << endl;
@@ -36,16 +36,18 @@ void print_datos_sequential(string data_file){
 
     cout << endl;
 }
-
+template <typename T>
 void print_range_sequential(){
     cout << "Busqueda por rango:" << endl;
     SequentialFile<string> file("Customer.dat", "auxiliar.dat");
 
-    vector<Record> result = file.range_search("Carlos", "Saulo");
+    vector<Record<T>> result = file.range_search("Carlos", "Saulo");
     for (auto i : result) i.showData();
 
     cout << "Busqueda por llave:\n";
-    Record* recordP = file.search("Abel");
+    Record<T>* recordP = file.search("Abel");
+    if (recordP) recordP->showData();
+    else cout << "No existe este registro\n";
     
     cout << "Llave existente:\n";
     recordP = file.search("Jorge");
@@ -67,15 +69,15 @@ int main(){
 
     // string s;
     // cin>>s;
-    Scanner scanner("create table Customer from file \"archive/alumnos.csv\" using index sequential(name)");
-    // // Scanner scanner("select * from Customer where DNI = 72790028");
+    // Scanner scanner("create table Customer from file \"archive/alumnos.csv\" using index sequential(name)");
+    Scanner scanner("select * from Customer where name = Jorge");
     // // Scanner scanner("select * from Customer where NAME = Juan");
     // // Scanner scanner("select * from Customer where ALTURA between 75 and 100");
     // // Scanner scanner("insert into Customer values (72790028, Juan, 123456789)");
     // // Scanner scanner("create table Customer from file \"data.csv\" using index avl(NAME)");
 
-    // Parser parser(&scanner);
-    // if(!parser.parse()) cout << "Parse error" << endl;
+    Parser parser(&scanner);
+    if(!parser.parse()) cout << "Parse error" << endl;
 
     return 0;
 }
