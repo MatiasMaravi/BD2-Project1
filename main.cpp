@@ -10,7 +10,7 @@ bool key_exist(string key, string line){
     return true;
 }
 
-void print_datos(string data_file){
+void print_datos_sequential(string data_file){
     cout << data_file << endl;
     fstream file1(data_file, ios::app | ios::in | ios::binary);
     Record cabecera;
@@ -37,9 +37,33 @@ void print_datos(string data_file){
     cout << endl;
 }
 
+void print_range_sequential(){
+    cout << "Busqueda por rango:" << endl;
+    SequentialFile<string> file("Customer.dat", "auxiliar.dat");
+
+    vector<Record> result = file.range_search("Carlos", "Saulo");
+    for (auto i : result) i.showData();
+
+    cout << "Busqueda por llave:\n";
+    Record* recordP = file.search("Abel");
+    
+    cout << "Llave existente:\n";
+    recordP = file.search("Jorge");
+    if (recordP) recordP->showData();
+    else cout << "No existe este registro\n";
+
+    cout << "Llave inexistente:\n";
+    recordP = file.search("Alejo");
+    if (recordP) recordP->showData();
+    else cout << "No existe este registro\n\n";
+
+    cout << "ReadRecord:\n";
+    file.readRecord(1,'d').showData();
+
+}
 int main(){
 
-    // print_datos("Customer.dat");
+    // print_datos_sequential("Customer.dat");
 
     // string s;
     // cin>>s;
@@ -50,9 +74,8 @@ int main(){
     // // Scanner scanner("insert into Customer values (72790028, Juan, 123456789)");
     // // Scanner scanner("create table Customer from file \"data.csv\" using index avl(NAME)");
 
-    Parser parser(&scanner);
-    if(!parser.parse()) cout << "Parse error" << endl;
-    
+    // Parser parser(&scanner);
+    // if(!parser.parse()) cout << "Parse error" << endl;
 
     return 0;
 }

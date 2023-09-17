@@ -423,54 +423,30 @@ vector<Record> SequentialFile<T>::range_search(T key1, T key2) {
 
     int pos = cabecera.next;
     char archivo = cabecera.archivo;
-
+    Record current;
     if (archivo == 'd') {
-        Record current;
         file.seekg(pos * sizeof(Record), ios::beg);
         file.read((char *)&current, sizeof(current));
-        string a = current.name;
-        while (a <= key2)
-        {
-            if (a >= key1) result.push_back(current);
-            if (current.next == -1) break;
-            if (current.archivo == 'a') {
-                aux.seekg(current.next * sizeof(Record), ios::beg);
-                aux.read((char *)&current, sizeof(current));
-                a = current.name;
-            }
-            else {
-                file.seekg(current.next * sizeof(Record), ios::beg);
-                file.read((char *)&current, sizeof(current));
-                a = current.name;
-            }
-        }
-        file.close();
-        aux.close();
-        return result;
-    }
-    else {
-        Record current;
+    }else {
         aux.seekg(pos * sizeof(Record), ios::beg);
         aux.read((char *)&current, sizeof(current));
-        string a = current.name;
-        while (a <= key2) {
-            if (a >= key1) result.push_back(current);
-            if (current.next == -1) break;
-            
-            if (current.archivo == 'a') {
-                aux.seekg(current.next * sizeof(Record), ios::beg);
-                aux.read((char *)&current, sizeof(current));
-                a = current.name;
-            }
-            else {
-                file.seekg(current.next * sizeof(Record), ios::beg);
-                file.read((char *)&current, sizeof(current));
-                a = current.name;
-            }
-        }
-        file.close();
-        aux.close();
-        return result;
     }
+    string a = current.name;
+    while (a <= key2){
+        if (a >= key1) result.push_back(current);
+        if (current.next == -1) break;
+        if (current.archivo == 'a') {
+            aux.seekg(current.next * sizeof(Record), ios::beg);
+            aux.read((char *)&current, sizeof(current));
+            a = current.name;
+        }else {
+            file.seekg(current.next * sizeof(Record), ios::beg);
+            file.read((char *)&current, sizeof(current));
+            a = current.name;
+        }
+    }
+    file.close();
+    aux.close();
+    return result;
 }
 
