@@ -58,8 +58,8 @@ bool Parser::advance() {
 bool Parser::isAtEnd() {
     return (current->type == Token::END);
 }
-template <typename T>
-void leer_record(string line, Record<T> &record, string key_table){
+
+void leer_record(string line, Record &record, string key_table){
     stringstream ss(line);
     string campo;
     getline(ss, campo, ',');
@@ -71,10 +71,6 @@ void leer_record(string line, Record<T> &record, string key_table){
     getline(ss, campo, ',');
     int ciclo = stoi(campo);
     record.setData(id, name, surname, ciclo);
-    if(key_table == "id") record.set_key_int(id);
-    else if(key_table == "name") record.set_key_string(name);
-    else if(key_table == "surname") record.set_key_string(surname);
-    else record.set_key_int(ciclo);
     
 }
 template <typename T>
@@ -82,7 +78,7 @@ void create_sequential(string key_table, string table_name, ifstream &file_){
     cout<<"Creando indice secuencial con key "<<key_table<<endl;
 
     SequentialFile<T> file(table_name + ".dat", "auxiliar.dat");
-    Record<T> record;
+    Record record;
     string campo, line;
     while(getline(file_, line)){
         leer_record(line, record, key_table);
@@ -91,10 +87,10 @@ void create_sequential(string key_table, string table_name, ifstream &file_){
     file_.close();
 }
 template <typename T>
-void search_sequential(string key_table, string table_name, T cadena){
+void search_sequential(string key_table, string table_name, string cadena){
     cout<<"Buscando en la tabla "<<table_name<<" con key "<<key_table<< " donde "<<key_table<<" = "<<cadena<<endl;
     SequentialFile<T> file(table_name + ".dat", "auxiliar.dat");
-    Record<T>* record = file.search(cadena);
+    Record* record = file.search(cadena);
     if(record){
         record->showData();
     }else{
@@ -153,14 +149,7 @@ bool Parser::parse_select(){
     if(!match(Token::EQUAL) && !match(Token::BETWEEN)) return false;
     if(previous->type == Token::EQUAL){
         if(!match(Token::ID) && !match(Token::NUMBER)) return false;
-            Token* value = previous;
-            if(value->type == Token::NUMBER){
-                //Por el momento no es posible porque el key es name(string)
-                int number = stoi(value->lexema);
-                search_sequential(key_table, table_name, number);
-            }else{
-                search_sequential(key_table, table_name, value->lexema);
-            }
+        //No implementado
     }else{
         if(!match(Token::NUMBER) && !match(Token::ID)) return false;
         Token value1 = *previous;
