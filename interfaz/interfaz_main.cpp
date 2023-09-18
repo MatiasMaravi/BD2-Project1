@@ -9,7 +9,7 @@
 #include "textinput.h"
 
 
-int interfaz(){
+int main(){
 
 
     // Inicializa la semilla del generador de números aleatorios

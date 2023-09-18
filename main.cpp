@@ -1,10 +1,12 @@
 #include <iostream>
+
 #include "Parser/Parser.hpp"
 #include "interfaz/interfaz_main.cpp"
 using namespace std;
 
 int main(){
-    int a = interfaz();
+    int a = interfaza();
+    cout<<a;
     // string s;
     // cin>>s;
     // Scanner scanner("create table Customer from file \"data.csv\" using index avl(NAME)");

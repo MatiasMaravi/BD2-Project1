@@ -49,17 +49,10 @@ cmake_ninja_workdir = /Users/jleandrojm/BaseDatosII/BD2-Project1/cmake-build-deb
 
 build cmake_object_order_depends_target_BD2_Project1: phony || CMakeFiles/BD2_Project1.dir
 
-build CMakeFiles/BD2_Project1.dir/main.cpp.o: CXX_COMPILER__BD2_Project1_Debug /Users/jleandrojm/BaseDatosII/BD2-Project1/main.cpp || cmake_object_order_depends_target_BD2_Project1
-  DEP_FILE = CMakeFiles/BD2_Project1.dir/main.cpp.o.d
-  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -mmacosx-version-min=13.2 -fcolor-diagnostics -std=gnu++14
-  INCLUDES = -I/Users/jleandrojm/BaseDatosII/BD2-Project1/Parser -isystem /opt/homebrew/opt/openssl@3/include -isystem /opt/homebrew/include
-  OBJECT_DIR = CMakeFiles/BD2_Project1.dir
-  OBJECT_FILE_DIR = CMakeFiles/BD2_Project1.dir
-
 build CMakeFiles/BD2_Project1.dir/interfaz/interfaz_main.cpp.o: CXX_COMPILER__BD2_Project1_Debug /Users/jleandrojm/BaseDatosII/BD2-Project1/interfaz/interfaz_main.cpp || cmake_object_order_depends_target_BD2_Project1
   DEP_FILE = CMakeFiles/BD2_Project1.dir/interfaz/interfaz_main.cpp.o.d
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -mmacosx-version-min=13.2 -fcolor-diagnostics -std=gnu++14
-  INCLUDES = -I/Users/jleandrojm/BaseDatosII/BD2-Project1/Parser -isystem /opt/homebrew/opt/openssl@3/include -isystem /opt/homebrew/include
+  INCLUDES = -isystem /opt/homebrew/opt/openssl@3/include -isystem /opt/homebrew/include
   OBJECT_DIR = CMakeFiles/BD2_Project1.dir
   OBJECT_FILE_DIR = CMakeFiles/BD2_Project1.dir/interfaz
 
@@ -71,7 +64,7 @@ build CMakeFiles/BD2_Project1.dir/interfaz/interfaz_main.cpp.o: CXX_COMPILER__BD
 #############################################
 # Link the executable BD2_Project1
 
-build BD2_Project1: CXX_EXECUTABLE_LINKER__BD2_Project1_Debug CMakeFiles/BD2_Project1.dir/main.cpp.o CMakeFiles/BD2_Project1.dir/interfaz/interfaz_main.cpp.o | /opt/homebrew/opt/openssl@3/lib/libcrypto.dylib /opt/homebrew/lib/libsfml-graphics.2.6.0.dylib /opt/homebrew/lib/libsfml-audio.2.6.0.dylib /opt/homebrew/lib/libsfml-window.2.6.0.dylib /opt/homebrew/lib/libsfml-system.2.6.0.dylib
+build BD2_Project1: CXX_EXECUTABLE_LINKER__BD2_Project1_Debug CMakeFiles/BD2_Project1.dir/interfaz/interfaz_main.cpp.o | /opt/homebrew/opt/openssl@3/lib/libcrypto.dylib /opt/homebrew/lib/libsfml-graphics.2.6.0.dylib /opt/homebrew/lib/libsfml-audio.2.6.0.dylib /opt/homebrew/lib/libsfml-window.2.6.0.dylib /opt/homebrew/lib/libsfml-system.2.6.0.dylib
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -mmacosx-version-min=13.2
   LINK_LIBRARIES = -Wl,-rpath,/opt/homebrew/lib  /opt/homebrew/opt/openssl@3/lib/libcrypto.dylib  /opt/homebrew/lib/libsfml-graphics.2.6.0.dylib  /opt/homebrew/lib/libsfml-audio.2.6.0.dylib  /opt/homebrew/lib/libsfml-window.2.6.0.dylib  /opt/homebrew/lib/libsfml-system.2.6.0.dylib
   OBJECT_DIR = CMakeFiles/BD2_Project1.dir

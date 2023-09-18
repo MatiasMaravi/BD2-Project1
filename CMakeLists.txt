@@ -5,8 +5,9 @@ set(CMAKE_CXX_STANDARD 14)
 set(OPENSSL_ROOT_DIR /opt/homebrew/opt/openssl@3)
 
 find_package(OpenSSL REQUIRED)
-include_directories(Parser)
+
 include_directories(${OPENSSL_INCLUDE_DIR})
+
 
 add_executable(BD2_Project1
 #        Parser/Parser.hpp
@@ -14,7 +15,7 @@ add_executable(BD2_Project1
 #        Parser/Token.hpp
 #        "Sequential file/prueba.cpp"
 #        "Sequential file/sequential_file.cpp"
-       main.cpp
+     #  main.cpp
         interfaz/record.h
         interfaz/textinput.h
         interfaz/button.h
