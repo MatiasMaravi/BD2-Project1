@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <sstream>
 #include <fstream>
 #include <vector>
 
@@ -34,6 +35,16 @@ struct Record {
         cout << "Surname: " << surname << "\n";
         cout << "Ciclo: " << ciclo << "\n";
         cout << "Next: " << next << archivo << "\n\n";
+    }
+    std::vector<std::string> toVector() const{
+        std::vector<std::string> recordVector;
+        recordVector.push_back(std::to_string(id));
+        recordVector.push_back(name);
+        recordVector.push_back(surname);
+        recordVector.push_back(std::to_string(ciclo));
+        recordVector.push_back(std::to_string(next));
+        recordVector.push_back(std::string(1, archivo));
+        return recordVector;
     }
 };
 

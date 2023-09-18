@@ -68,15 +68,15 @@ int main(){
 
     // string s;
     // cin>>s;
-    Scanner scanner("create table Customer from file \"archive/alumnos.csv\" using index sequential(name)");
+    // Scanner scanner("create table Customer from file \"archive/alumnos.csv\" using index sequential(name)");
     // Scanner scanner("select * from Customer where name = Jorge");
     // // Scanner scanner("select * from Customer where NAME = Juan");
     // // Scanner scanner("select * from Customer where ALTURA between 75 and 100");
     // // Scanner scanner("insert into Customer values (72790028, Juan, 123456789)");
     // // Scanner scanner("create table Customer from file \"data.csv\" using index avl(NAME)");
 
-    Parser parser(&scanner);
-    if(!parser.parse()) cout << "Parse error" << endl;
+    // Parser parser(&scanner);
+    // if(!parser.parse()) cout << "Parse error" << endl;
     print_datos_sequential("Customer.dat");
     return 0;
 }
