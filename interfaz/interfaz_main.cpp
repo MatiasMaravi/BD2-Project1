@@ -12,7 +12,7 @@
 int main(){
 
 
-    // Inicializa la semilla del generador de números aleatorios
+
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     // Define las dimensiones de la tabla
@@ -22,18 +22,46 @@ int main(){
     const float cellHeight = 30.f;
 
     // Crear una ventana de SFML
-    sf::RenderWindow window(sf::VideoMode(1100, 700), "Tabla de Registros");
-    TextInput input(200, 40, 870, 300);
+    sf::RenderWindow window(sf::VideoMode(1100, 720), "Tabla de Registros");
+    TextInput input(240, 42, 858, 300);
     std::string savedText;
-    Button button(500, 0, 100, 40, "Execute");
 
-    button.setOnClick([&input, &savedText]() {
+    Button button_execute(180.f, 280.f, 50.f, 50.f,"../interfaz/execute.png");
+    Button button_equis(1040.f, 2.f, 35.f, 35.f,"../interfaz/close-icon-30.png");
+    Button button_tabla_1(40.f, 100.f, 60.f, 50.f,"../interfaz/tabla.png");
+    Button button_tabla_2(40.f, 200.f, 60.f, 50.f,"../interfaz/tabla.png");
+    sf::RectangleShape rectangle_arriba;
+    rectangle_arriba.setSize(sf::Vector2f(1100, 8));
+    rectangle_arriba.setPosition(0, 0);
+    rectangle_arriba.setFillColor(sf::Color(236, 190, 58));
+    rectangle_arriba.setOutlineThickness(2);
+    rectangle_arriba.setOutlineColor(sf::Color::Black);
+
+    sf::RectangleShape rectangle_abajo;
+    rectangle_abajo.setSize(sf::Vector2f(1100, 40));
+    rectangle_abajo.setPosition(0, 682);
+    rectangle_abajo.setFillColor(sf::Color(141, 105, 0));
+    rectangle_abajo.setOutlineThickness(2);
+    rectangle_abajo.setOutlineColor(sf::Color::Black);
+
+    sf::RectangleShape rectangle_medio;
+    rectangle_arriba.setSize(sf::Vector2f(1100, 40));
+    rectangle_arriba.setPosition(0, 0);
+    rectangle_arriba.setFillColor(sf::Color(236, 190, 58));
+
+
+
+
+    button_execute.setOnClick([&input, &savedText]() {
         std::string text = input.getText();
         savedText = text;
         std::cout << "Botón clickeado. Texto guardado: " << savedText << std::endl;
 
         input.clearText();
     });
+
+
+
     // Crear una fuente para el texto
     sf::Font font;
     if (!font.loadFromFile("../interfaz/Arial.ttf")) {
@@ -56,14 +84,22 @@ int main(){
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
-            }else {
-                button.handleEvent(event, sf::Vector2f(sf::Mouse::getPosition(window)));
+            }
+
+            else {
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                    sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+                    if (button_equis.getGlobalBounds().contains(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y))) {
+                        window.close();
+                    }}
+
+                button_execute.handleEvent(event, sf::Vector2f(sf::Mouse::getPosition(window)));
                 input.handleEvent(event, sf::Vector2f(sf::Mouse::getPosition(window)));
             }
 
         }
 
-        window.clear(sf::Color::White);
+        window.clear(sf::Color(255, 240, 196));
 
 
         // Dibujar las cabeceras de las columnas
@@ -102,8 +138,15 @@ int main(){
                 window.draw(text);
             }
         }
-        window.draw(button);
-        window.draw(input);
+        window.draw(button_execute);
+        window.draw(rectangle_arriba);
+        window.draw(rectangle_abajo);
+        window.draw(button_equis);
+        window.draw(button_tabla_1);
+        window.draw(button_tabla_2);
+
+       window.draw(input);
+
 
         window.display();
     }
