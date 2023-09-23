@@ -53,13 +53,13 @@ int main() {
     }
 
     cout << endl;
-    // cout << "Busqueda por rango:" << endl;
+    cout << "Busqueda por rango:" << endl;
 
-    // vector<Record> result = file.range_search("Carlos", "Saulo");
-    // for (auto i : result) i.showData();
+    vector<Record> result = file.range_search("Carlos", "Saulo");
+    for (auto i : result) i.showData();
 
-    // cout << "Busqueda por llave:\n";
-    // Record* recordP = file.search("Abel");
+    cout << "Busqueda por llave:\n";
+    Record* recordP = file.search("Abel");
     
     // cout << "Llave existente:\n";
     // recordP = file.search("Jorge");
