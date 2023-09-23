@@ -391,33 +391,31 @@ bool SequentialFile<T, TK>::remove(TK key) {
 template <class T, typename TK>
 Record* SequentialFile<T, TK>::search(TK key) {
     fstream file (this->datos, ios::in | ios::out | ios::binary);
-    Record* result = new Record();
-    string a, b = key;
+    Record result;
     int l = 1, u = size_datos() - 1, m;
     
     while (u >= l) {
         m = (l+u) / 2;
         file.seekg(sizeof(Record)*m, ios::beg);
-        file.read((char*) result, sizeof(Record));
-        a = result->name;
-        if (a > b) u = m - 1;
-        else if (a < b) l = m + 1;
+        file.read((char*)&result, sizeof(Record));
+        if (greater_key(result,key)) u = m - 1;
+        else if (less_key(result,key)) l = m + 1;
         else break;
     }
     file.close();
 
-    if (a != b) {
+    if (!equal_key(result,key)) {
         fstream auxFile (this->auxiliar, ios::in | ios::out | ios::binary);
         if (!auxFile.is_open()) throw ("No se pudo abrir el archivo auxiliar");
         for (int i = 0; i < size_auxiliar(); i++) {
-            auxFile.read((char*) result, sizeof(Record));
-            a = result->name;
-            if (a == b) break;
+            auxFile.read((char*)& result, sizeof(Record));
+            if (equal_key(result,key)) break;
         }
         auxFile.close();
     }
-    
-    return (a == b)? result : nullptr;
+    Record* r = new Record;
+    r->setData(result.id, result.name, result.surname, result.ciclo);
+    return (equal_key(result,key))? r : nullptr;
 }
 
 template <class T, typename TK>

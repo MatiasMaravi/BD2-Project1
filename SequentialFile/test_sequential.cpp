@@ -21,37 +21,47 @@ SequentialFile<T, TK>::SequentialFile(string filename1, string filename2,
 }
 */
 int main() {
-    SequentialFile<Record, string> file("datos.dat", "auxiliar.dat",
-                    []( Record const&a, Record const&b) { return strcmp(a.name,b.name) < 0 ;},
-                    []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) > 0 ;},
-                    []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) == 0 ;},
-                    []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) == 0 ;},
-                    []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) < 0 ;},
-                    []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) > 0 ;}
-                    );
-    
+    //Key name
+    // SequentialFile<Record, string> file("datos.dat", "auxiliar.dat",
+    //                 []( Record const&a, Record const&b) { return strcmp(a.name,b.name) < 0 ;},
+    //                 []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) > 0 ;},
+    //                 []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) == 0 ;},
+    //                 []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) == 0 ;},
+    //                 []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) < 0 ;},
+    //                 []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) > 0 ;}
+    //                 );
+
+    //Key ciclo
+    SequentialFile<Record, int> file("datos.dat", "auxiliar.dat",
+                []( Record const&a, Record const&b) { return a.ciclo < b.ciclo;},
+                []( Record const&a,  Record const&b) { return a.ciclo > b.ciclo;},
+                []( Record const&a,  Record const&b) { return a.ciclo == b.ciclo;},
+                []( Record const&a,  int const&b) { return a.ciclo == b;},
+                []( Record const&a,  int const&b) { return a.ciclo < b;},
+                []( Record const&a,  int const&b) { return a.ciclo > b;}
+                );
     // Record record;
     // record.setData(1, "Andres", "Perez", 1);
     // file.insert(record);
-    // record.setData(2, "Carlos", "Perez", 1);
+    // record.setData(2, "Carlos", "Perez", 3);
     // file.insert(record);
-    // record.setData(3, "Cintia", "Perez", 1);
+    // record.setData(3, "Cintia", "Perez", 2);
     // file.insert(record);
-    // record.setData(4, "Jorge", "Perez", 1);
+    // record.setData(4, "Jorge", "Perez", 7);
     // file.insert(record);
-    // record.setData(5, "Josimar", "Perez", 1);
+    // record.setData(5, "Josimar", "Perez", 4);
     // file.insert(record);
-    // record.setData(6, "Mabel", "Perez", 1);
+    // record.setData(6, "Mabel", "Perez", 2);
     // file.insert(record);
-    // record.setData(7, "Saulo", "Perez", 1);
+    // record.setData(7, "Saulo", "Perez", 8);
     // file.insert(record);
-    // record.setData(8, "Gabriel", "Perez", 1);
+    // record.setData(8, "Gabriel", "Perez", 9);
     // file.insert(record);
-    // record.setData(9, "Gonzalo", "Perez", 1);
+    // record.setData(9, "Gonzalo", "Perez", 6);
     // file.insert(record);
-    // record.setData(10, "Maria", "Perez", 1);
+    // record.setData(10, "Maria", "Perez", 100);
     // file.insert(record);
-    // record.setData(11, "Abel", "Perez", 1);
+    // record.setData(11, "Abel", "Perez", 12);
     // file.insert(record);
 
     // cout << "Datos.dat" << endl;
@@ -78,14 +88,15 @@ int main() {
     //     file2.read((char *)&current, sizeof(current));
     // }
 
-    cout << endl;
-    cout << "Busqueda por rango:" << endl;
+    // cout << endl;
+    // cout << "Busqueda por rango:" << endl;
 
-    vector<Record> result = file.range_search("Carlos", "Saulo");
-    for (auto i : result) i.showData();
+    // vector<Record> result = file.range_search(5, 6);
+    // for (auto i : result) i.showData();
 
-    cout << "Busqueda por llave:\n";
-    Record* recordP = file.search("Carlos");
+    // cout << "Busqueda por llave:\n";
+    // Record* recordP = file.search("Abel");
+    // recordP->showData();
     
     // cout << "Llave existente:\n";
     // recordP = file.search("Jorge");
@@ -100,13 +111,13 @@ int main() {
     // cout << "ReadRecord:\n";
     // file.readRecord(1,'d').showData();
 
-    cout << "Remove:\n";
+    // cout << "Remove:\n";
     // if (file.remove("Abel")) cout << "Se elimino Abel\n";
     // else cout << "No se elimino Abel\n";
 
     // if (file.remove("Jorge")) cout << "Se elimino Jorge\n";
     // else cout << "No se elimino Jorge\n";
-    // cout << "Reorganizar\n:";
-    // file.reorganizar();
+    cout << "Reorganizar\n:";
+    file.reorganizar();
     return 0;
 }
