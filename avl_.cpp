@@ -59,16 +59,17 @@ public:
     }
 
     void insert(Record record){
-        fstream f(this->filename, ios::in | ios::out | ios::binary);
-        insert(pos_root, record, f);
-        f.close();
+        fstream file(this->filename, ios::in | ios::out | ios::binary);
+        if (!file.is_open()) throw std::runtime_error("No se pudo abrir el archivo");
+        insert(pos_root, record, file);
+        file.close();
     }
 
     template <class T>
     void remove(T key){
-        fstream f(this->filename, ios::in | ios::out | ios::binary);
-        remove(pos_root, key, f);
-        f.close();
+        fstream file(this->filename, ios::in | ios::out | ios::binary);
+        remove(pos_root, key, file);
+        file.close();
     }
 
     vector<Record> inorder(){
@@ -119,35 +120,36 @@ private:
 
     void insert(long pos_node, Record record, fstream& file){
         file.seekg(0, ios::end);
+
         if(file.tellg() == 0){
             file.write((char*)&record, sizeof(Record));
             return;
         }
 
-        Record curr_record;
+        Record RecordCurrent;
         file.seekg(pos_node, ios::beg);
-        file.read((char*)&curr_record, sizeof(Record));
+        file.read((char*)&RecordCurrent, sizeof(Record));
 
-        if(record.cod < curr_record.cod){
-            if(curr_record.left == -1){
+        if(record.cod < RecordCurrent.cod){
+            if(RecordCurrent.left == -1){
                 file.seekp(0, ios::end);
-                curr_record.left = file.tellg();
+                RecordCurrent.left = file.tellg();
                 file.write((char*)&record, sizeof(Record));
                 file.seekg(pos_node, ios::beg);
-                file.write((char*)&curr_record, sizeof(Record));
+                file.write((char*)&RecordCurrent, sizeof(Record));
             }
             else
-                insert(curr_record.left, record, file);
-        }else if(record.cod > curr_record.cod){
-            if(curr_record.right == -1){
+                insert(RecordCurrent.left, record, file);
+        }else if(record.cod > RecordCurrent.cod){
+            if(RecordCurrent.right == -1){
                 file.seekp(0, ios::end);
-                curr_record.right = file.tellg();
+                RecordCurrent.right = file.tellg();
                 file.write((char*)&record, sizeof(Record));
                 file.seekg(pos_node, ios::beg);
-                file.write((char*)&curr_record, sizeof(Record));
+                file.write((char*)&RecordCurrent, sizeof(Record));
             }
             else
-                insert(curr_record.right, record, file);
+                insert(RecordCurrent.right, record, file);
         }
 
         updateHeight(pos_node, file);
@@ -210,9 +212,6 @@ private:
         balance(pos_node, file);
 
     }
-
-    //searchrange
-
     void searchRange(long pos_node, int start, int end, vector<Record>& result, ifstream& file){
         if(pos_node == -1)
             return;
@@ -335,6 +334,7 @@ private:
         updateHeight(pos_node, file);
         updateHeight(pos_temp, file);
     }   
+
     template<typename TK>
     vector<Record> rangeSearch(fstream &file, TK begin_key, TK end_key ,long &pos_node, vector<Record> &result) {
         Record record;
@@ -417,7 +417,6 @@ string menu(){
     return op;
 }
 
-
 void test(){
     string op = menu();
     if(op == "1") writeFile();
@@ -428,7 +427,6 @@ void test(){
     else if(op == "6") exit(0);
     else cout<<"Opcion incorrecta"<<endl;
 }
-
 
 int main(){
     test();
