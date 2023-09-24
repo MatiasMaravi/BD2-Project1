@@ -43,28 +43,33 @@ string to_binary(int n){
 //alumno
 struct Record{
     int codigo;
-    char name[10];
-    int ciclo;
+    string name;
+    int value;
+    int age;
     void setData(){
         cout<<"Codigo: ";cin>>codigo;
         cout<<"Nombre: ";cin>>name;
-        cout<<"Ciclo: ";cin>>ciclo;
+        cout<<"Valor: ";cin>>value;
+        cout<<"Edad: ";cin>>age;
     }
 
     Record(){
         codigo = -1;
-        strcpy(name,"");
-        ciclo = -1;
+        name = "";
+        value = 0;
+        age = 0;
     }
-    Record(int codigo, string name, int ciclo){
+    Record(int codigo, string name, int ciclo, int age){
         this->codigo = codigo;
-        strcpy(this->name,name.c_str());
-        this->ciclo = ciclo;
+        this->name = name;
+        this->value = ciclo;
+        this->age = age;
     }
     void print(){
         cout<<"Codigo: "<<codigo<<endl;
         cout<<"Nombre: "<<name<<endl;
-        cout<<"Ciclo: "<<ciclo<<endl;
+        cout<<"Ciclo: "<<value<<endl;
+        cout<<"Edad: "<<age<<endl;
     }
 };
 

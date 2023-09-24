@@ -2,7 +2,7 @@
 int main(){
     
     DynamicHash dh("buckets.dat","indices.dat");
-
+/*
     Record r1(1,"leo",3);
     Record r2(2,"juan",3);
     Record r3(3,"pedro",3);
@@ -54,12 +54,9 @@ int main(){
     dh.add(r23);
     dh.add(r24);
 
+*/
 
-
-
-    
-
-    Record r100= dh.search(3054);
+    Record r100= dh.search(25);
     r100.print();
    
     
