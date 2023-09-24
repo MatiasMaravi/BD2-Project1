@@ -91,14 +91,16 @@ SequentialFile<T, TK>::SequentialFile(string filename1, string filename2,
 template <class T, typename TK>
 Record SequentialFile<T, TK>::readRecord(int pos, char fileChar) {
     Record result;
+    
     if (fileChar == 'a') {
         fstream file(this->auxiliar, ios::in | ios::binary);
         if (!file.is_open()) throw("No se pudo abrir el archivo");
-        if (pos > size_auxiliar()) {
+        if (pos > size_auxiliar() || pos < 1) {
             cout << "No existen datos en esa posición\n";
             return result;
         }
 
+        
         file.seekg(sizeof(Record)*pos, ios::beg);
         file.read((char*) &result, sizeof(Record));
 
@@ -107,7 +109,7 @@ Record SequentialFile<T, TK>::readRecord(int pos, char fileChar) {
     else if (fileChar == 'd') {
         fstream file(this->datos, ios::in | ios::binary);
         if (!file.is_open()) throw("No se pudo abrir el archivo");
-        if (pos > size_datos()) {
+        if (pos > size_datos() || pos < 1) {
             cout << "No existen datos en esa posición\n";
             return result;
         }
@@ -318,8 +320,11 @@ bool SequentialFile<T, TK>::insert(Record record) {
 template <class T, typename TK>
 bool SequentialFile<T, TK>::remove(TK key) {
     fstream file (this->datos, ios::in | ios::out | ios::binary);
-    if (!file.is_open()) return false;
-    // Al momento de eliminar, reemplazaremos el puntero con -1a ya que el últimos elemento siempre apunta a -1d
+    if (!file.is_open()) {
+        cout << "No se pudo remover el registro ya que no se abrio el archivo principal\n";
+        return false;
+    }
+    // Al momento de eliminar, reemplazaremos el puntero con -1a ya que el último elemento siempre apunta a -1d
     
     // Primero validamos si el registro a eliminar es el primero
     Record cabecera;
@@ -328,18 +333,44 @@ bool SequentialFile<T, TK>::remove(TK key) {
     // Ahora leemos ese registro
     Record record = readRecord(cabecera.next, cabecera.archivo), auxRecord;
     if (equal_key(record, key)) {
-        cabecera.next = record.next;
-        cabecera.archivo = record.archivo;
+        int auxPos = record.next;
+        char auxChar = record.archivo;
+        if (cabecera.archivo == 'd') {
+            record.next = -1;
+            record.archivo = 'a';
+            file.seekp(sizeof(Record) * cabecera.next, ios::beg);
+            file.write((char*) &record, sizeof(Record));
+        }
+        else {
+            fstream auxFile (this->auxiliar, ios::in | ios::out | ios::binary);
+            if (!auxFile.is_open()) {
+                cout << "No se pudo remover el registro ya que no se abrio el archivo auxiliar\n";
+                return false;
+            }
+            
+            record.next = -1;
+            record.archivo = 'a';
+            
+            auxFile.seekp(sizeof(Record) * (cabecera.next - 1), ios::beg);
+            auxFile.write((char*) &record, sizeof(Record));
+            auxFile.close();
+        }
+        cabecera.next = auxPos;
+        cabecera.archivo = auxChar;
+
         file.seekp(0, ios::beg);
         file.write((char*) &cabecera, sizeof(Record));
         file.close();
 
-        reorganizar();
         return true;
     } // En caso no sea el primero, deberemos buscar su predecesor
     else {
         fstream auxFile (this->auxiliar, ios::in | ios::out | ios::binary);
-
+        if (!auxFile.is_open()) {
+            cout << "No se pudo remover el registro ya que no se abrio el archivo auxiliar\n";
+            return false;
+        }
+        
         char fileChar = 'd', auxChar; int pos = 1, auxPos;
         
         do {
@@ -377,7 +408,6 @@ bool SequentialFile<T, TK>::remove(TK key) {
                 file.close();
                 auxFile.close();
                 
-                reorganizar();
                 return true;
             }
             fileChar = record.archivo; pos = record.next;
@@ -413,6 +443,9 @@ Record* SequentialFile<T, TK>::search(TK key) {
         }
         auxFile.close();
     }
+
+    if (result.archivo == 'a' && result.next == -1) return nullptr;
+    
     Record* r = new Record;
     r->setData(result.id, result.name, result.surname, result.ciclo);
     return (equal_key(result,key))? r : nullptr;
@@ -440,8 +473,11 @@ vector<Record> SequentialFile<T, TK>::range_search(TK key1, TK key2) {
         file.read((char *)&current, sizeof(current));
         while (less_key(current,key2) || equal_key(current,key2)) //a <= key2
         {
-            if (greater_key(current,key1) || equal_key(current,key1)) result.push_back(current); //a >= key1
-            if (current.next == -1) break;
+            if (greater_key(current,key1) || equal_key(current,key1)) { //a >= key1
+                if (current.next != -1 || current.next != 'a')
+                    result.push_back(current);
+            }
+            if (current.next == -1 && current.archivo == 'd') break;
             if (current.archivo == 'a') {
                 aux.seekg(current.next * sizeof(Record), ios::beg);
                 aux.read((char *)&current, sizeof(current));
@@ -460,8 +496,11 @@ vector<Record> SequentialFile<T, TK>::range_search(TK key1, TK key2) {
         aux.seekg(pos * sizeof(Record), ios::beg);
         aux.read((char *)&current, sizeof(current));
         while (less_key(current,key2) || equal_key(current,key2)) { //a <= key2
-            if (greater_key(current,key1) || equal_key(current,key1)) result.push_back(current); //a >= key1
-            if (current.next == -1) break;
+            if (greater_key(current,key1) || equal_key(current,key1)) { //a >= key1
+                if (current.next != -1 || current.next != 'a')
+                    result.push_back(current);
+            }
+            if (current.next == -1 && current.archivo == 'd') break;
             
             if (current.archivo == 'a') {
                 aux.seekg(current.next * sizeof(Record), ios::beg);
