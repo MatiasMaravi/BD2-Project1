@@ -473,11 +473,10 @@ vector<Record> SequentialFile<T, TK>::range_search(TK key1, TK key2) {
         file.read((char *)&current, sizeof(current));
         while (less_key(current,key2) || equal_key(current,key2)) //a <= key2
         {
-            if (greater_key(current,key1) || equal_key(current,key1)) { //a >= key1
-                if (current.next != -1 || current.next != 'a')
-                    result.push_back(current);
-            }
-            if (current.next == -1 && current.archivo == 'd') break;
+            if (greater_key(current,key1) || equal_key(current,key1)) result.push_back(current); //a >= key1
+            
+            if (current.next == -1 &&) break;
+            
             if (current.archivo == 'a') {
                 aux.seekg(current.next * sizeof(Record), ios::beg);
                 aux.read((char *)&current, sizeof(current));
@@ -496,11 +495,9 @@ vector<Record> SequentialFile<T, TK>::range_search(TK key1, TK key2) {
         aux.seekg(pos * sizeof(Record), ios::beg);
         aux.read((char *)&current, sizeof(current));
         while (less_key(current,key2) || equal_key(current,key2)) { //a <= key2
-            if (greater_key(current,key1) || equal_key(current,key1)) { //a >= key1
-                if (current.next != -1 || current.next != 'a')
-                    result.push_back(current);
-            }
-            if (current.next == -1 && current.archivo == 'd') break;
+            if (greater_key(current,key1) || equal_key(current,key1)) result.push_back(current); //a >= key1
+            
+            if (current.next == -1) break;
             
             if (current.archivo == 'a') {
                 aux.seekg(current.next * sizeof(Record), ios::beg);
