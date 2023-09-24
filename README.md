@@ -1,4 +1,3 @@
-# BD2-Project1
 # Base de Datos II: Proyecto 1
 
 ### Integrantes:
