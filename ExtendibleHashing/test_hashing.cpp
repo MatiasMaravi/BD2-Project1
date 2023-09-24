@@ -61,7 +61,7 @@ void cargar_hash(){
 }
 
 int main() {
-    std::ifstream archivo("./Dataset/datos_1000.csv"); // Abre el archivo CSV
+    std::ifstream archivo("../Dataset/datos_1000.csv"); // Abre el archivo CSV
     if (!archivo.is_open()) {
         std::cerr << "No se pudo abrir el archivo." << std::endl;
         return 1;
@@ -76,43 +76,49 @@ int main() {
 
     int contador=0;
     int num_linea=0;
-
-    DynamicHash<Record,int> dh("buckets.dat","indices.dat",
-                                [](const Record& r){return r.id;},
-                                [](const int& number){return hash_int(number);},
-                                [](const Record& r, const int& number){return r.id==number;},
+    //Key = ID
+    // DynamicHash<Record,int> dh1("buckets.dat","indices.dat",
+    //                             [](const Record& r){return r.id;},
+    //                             [](const int& value){return hash_int(value);},
+    //                             [](const Record& r, const int& value){return r.id==value;},
+    //                             226);
+    //Key = Nacionalidad
+    DynamicHash<Record,string> dh("buckets.dat","indices.dat",
+                                [](const Record& r){return r.nacionalidad;},
+                                [](const string& value){return hash_string(value);},
+                                [](const Record& r, const string& value){return r.nacionalidad==value;},
                                 226);
     
     
-    // Leer el archivo línea por línea
-    while (std::getline(archivo, linea)) {
-        std::istringstream ss(linea);
-        std::string token;
-        std::vector<std::string> fila;
+    // // Leer el archivo línea por línea
+    // while (std::getline(archivo, linea)) {
+    //     std::istringstream ss(linea);
+    //     std::string token;
+    //     std::vector<std::string> fila;
         
-            while (std::getline(ss, token, ',')) {
-                // Verificar si el token está vacío o contiene solo comas
-                    fila.push_back(token);
-            }
+    //         while (std::getline(ss, token, ',')) {
+    //             // Verificar si el token está vacío o contiene solo comas
+    //                 fila.push_back(token);
+    //         }
 
-            // Agregar la fila solo si contiene al menos un campo no vacío
+    //         // Agregar la fila solo si contiene al menos un campo no vacío
 
-                datos.push_back(fila);
+    //             datos.push_back(fila);
 
 
-                Record r1;
-                r1.id=stoi(fila[0]);
-                strcpy(r1.name,fila[1].c_str());
-                r1.value=stoi(fila[2]);
-                r1.age=stoi(fila[3]);
-                strcpy(r1.fecha,fila[4].c_str());
-                strcpy(r1.nacionalidad,fila[9].c_str());
-                dh.add(r1);
+    //             Record r1;
+    //             r1.id=stoi(fila[0]);
+    //             strcpy(r1.name,fila[1].c_str());
+    //             r1.value=stoi(fila[2]);
+    //             r1.age=stoi(fila[3]);
+    //             strcpy(r1.fecha,fila[4].c_str());
+    //             strcpy(r1.nacionalidad,fila[9].c_str());
+    //             dh.add(r1);
 
-    }
+    // }
 
-    // Cerrar el archivo
-    archivo.close();
+    // // Cerrar el archivo
+    // archivo.close();
 
     // Imprimir los datos leídos
     for (const auto& fila : datos) {
@@ -124,7 +130,7 @@ int main() {
 
     cout<<"---------------------"<<endl;
 
-    Record r100= dh.search(223489);
+    Record r100= dh.search("Poland");
     r100.print();
 
     
