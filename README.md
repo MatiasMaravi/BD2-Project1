@@ -16,9 +16,9 @@ Paso 2:
 
 Paso 3:  
 - Como la inserccion lo estamos haciendo siguiendo un lineamiento tipo árbol, insertaremos a la izquierda si el la posicion en donde se evalue el binario es 0 y derecha si es 1, de esta forma los buckets se encontraran en las hojas.
-  
-  <img width="542" alt="image" aling="center" src="https://github.com/MatiasMaravi/BD2-Project1/assets/90939274/9ee84baa-9287-4e86-936f-bed2b5104fd4">
-
+  <p align="center">
+  <img width="542" alt="image"  src="https://github.com/MatiasMaravi/BD2-Project1/assets/90939274/9ee84baa-9287-4e86-936f-bed2b5104fd4">
+  </p>
   
 Paso 4:
 - Verificaremos el desbordamiento del bucket es decir si el bucket se encuentra lleno, de ser asi tendremos que crear otro bucket y aumentarle su profundidad, si ya se llego a la profundidad global, es decir el numero maximo de buckets, se procedera a crear un nuevo bucket y enlazarlo al ultimo bucket creado.
