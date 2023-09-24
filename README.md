@@ -1,3 +1,5 @@
+# BD2-Project1
+=======
 # Base de Datos II: Proyecto 1
 
 ### Integrantes:
@@ -68,7 +70,7 @@ La eliminacion cuando
 El extendible hashing es un metodo de hash dinamico en el que utilizamos directorios(indices) y depositos(Buckets) para realizar hash de datos. En terminos mas simples el extendible
 hashing es un metodo agresivamente flexible en el que la función hash también experimenta cambios dinámicos.
 
-### Inserción:
+#### Inserción:
 La inserccion en el extendible hashing cuenta con una serie de pasos:
 
 Paso 1:
@@ -98,11 +100,11 @@ Paso 4:
   <img width="404" alt="image" src="https://github.com/MatiasMaravi/BD2-Project1/assets/90939274/b8872adf-aaf5-4fed-ab34-52142fd35755">
 </p>
 
-### Busqueda:
+#### Busqueda:
 
 En el algoritmo de busqueda, primero hashearemos la llave a travez de la cual vamos a buscar, luego recorremos el arbol digital, dependiendo el valor que obtendremos en el binario, si es o avanzaremos por la rama izquierda sino iremos por la derecha, en caso no se encuentre la llave, devolvera un valor sin nada.
 
-### Eliminacion:
+#### Eliminacion:
 
 En el algoritmo de Eliminación utilizaremos el algoritmo de busqueda ya que buscaremos la llave a eliminar en el extendible y procederemos a eliminarlo, reduciremos el numero de elementos en el bucket por lo que si se inserta un nuevo elemento en el bucket, este reescribira al registro que ya esta eliminado.
 

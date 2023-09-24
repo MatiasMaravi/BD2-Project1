@@ -1,0 +1,1 @@
+rm buckets.dat && rm indices.dat
