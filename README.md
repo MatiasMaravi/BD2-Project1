@@ -49,8 +49,17 @@ La inserccion de un registro comienza con el caso base donde el arbol tendra su 
   <img src="https://www.ibiblio.org/pub/Linux/docs/LuCaS/Tutoriales/doc-programacion-arboles-avl/htmls/tree10.png" height="400"/>
 </p>
 
-### Eliminacion:
+De ser necesario en algunos casos se haran rotaciones dobles a la izquierda y derecha o derecha y izquierda.
 
+<p align="center">
+  <img src="https://www.ibiblio.org/pub/Linux/docs/LuCaS/Tutoriales/doc-programacion-arboles-avl/htmls/tree11.png" height="400"/>
+</p>
+
+### Eliminacion:
+Numero 1:
+La eliminacion se realiza con la busqueda del registro a eliminar y presenta los casos correspondientes, si el nodo no tiene hijos o registros. Se elimina directamente el registro
+Numero 2:
+La eliminacion cuando 
 ### Busqueda:
 
 ### Busqueda por rango:
