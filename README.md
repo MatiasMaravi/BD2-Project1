@@ -42,14 +42,14 @@ En el algoritmo de busqueda, primero hashearemos la llave a travez de la cual va
 
 En el algoritmo de Eliminación utilizaremos el algoritmo de busqueda ya que buscaremos la llave a eliminar en el extendible y procederemos a eliminarlo, reduciremos el numero de elementos en el bucket por lo que si se inserta un nuevo elemento en el bucket, este reescribira al registro que ya esta eliminado.
 
-#### Ventajas y desventajas:
+### Ventajas y desventajas:
 
-##### Ventajas:
+#### Ventajas:
 
 - No hay problema de pérdida de datos ya que la capacidad de almacenamiento aumenta dinámicamente.
 - Con los cambios dinámicos en la función hash, los valores antiguos asociados se repiten con la nueva función hash.
 
-##### Desventajas:
+### Desventajas:
 
 - El numero de buckets puede aumentar significativamente si se aplican hash a varios registros en el mismo bucket manteniendo la distribución de registros no uniforme.
 - Desperdicio de memoria debido a que ciertos depósitos contienen más datos que otros.
