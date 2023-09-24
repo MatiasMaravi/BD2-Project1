@@ -37,4 +37,22 @@ Este algoritmo se encarga de dos cosas. En primer lugar, hallará el valor a eli
 Para la búsqueda tenemos dos casos: búsqueda simple y búsqueda por rango. El primero, simplemente, realizará una búsqueda binaria en el "archivo principal". Si no se encuentra en el "archivo principal", entonces se recorrerá todo el "archivo auxiliar" hasta que se encuentre. Si se encuentra el registro a buscar, se retornará un puntero de este; sino, retornará un puntero vacío. El segundo, comparará con respecto a los valores condicionales, es decir, aquellos registros que están dentro del rango de los valores ingresados. Por lo cual, comienza desde el primer registro y va agregando aquellos registros que cumplan con esta condición. Hasta encontrar un registro que no cumpla con esta condición, se seguirá recorriendo los archivos.
 
 ### AVL File:
+El avl es una estructura de datos que se caracteriza por ser un arbol BST autoequilibrado donde la diferencia entre las alturas de los subárboles izquierdo y derecho para cualquier nodo no puede ser más de uno. De esta estructura lo usamos con archivos y registros para una busqueda mas eficiente donde cada nodo es un registro y el archivo tiene dos punteros para la organizacion a la derecha y a la izquierda.
+<p align="center">
+  <img src="https://estructurasite.files.wordpress.com/2016/04/arboles1.jpg" height="400"/>
+</p>
+
+### Inserccion:
+
+La inserccion de un registro comienza con el caso base donde el arbol tendra su primer registro en la posicion 1 del archivo y sera el nodo padre del arbol. Despues del primer nodo(Registro). Se realizaran insercciones a la izquierda del arbol si el siguiente registro tiene un primary key menor al registro del nodo padre, de la misma forma se relizara inserciones a la derecha del arbol si el siguiente registro tiene un primary key mayor al registro del nodo padre. Cada vez que la diferencia entre las alturas del subárbol izquierdo y el subárbol derecho de cualquier nodo sea mas de uno se realizaran rotaciones en el archivo cambiando la direccion de la poscion del nodo padre y los hijos dependiendo de si la rotacion es a la derecha o izquierda.
+<p align="center">
+  <img src="https://www.ibiblio.org/pub/Linux/docs/LuCaS/Tutoriales/doc-programacion-arboles-avl/htmls/tree10.png" height="400"/>
+</p>
+
+### Eliminacion:
+
+### Busqueda:
+
+### Busqueda por rango:
+
 ### Extendible Hashing:
