@@ -36,30 +36,43 @@ void print_datos_sequential(string data_file){
 
     cout << endl;
 }
-void print_range_sequential(){
-    cout << "Busqueda por rango:" << endl;
-    SequentialFile<string> file("Customer.dat", "auxiliar.dat");
+template <typename T>
+void print_range_sequential(T key = "name"){
+    if(key == "name"){
+        cout << "Busqueda por rango:" << endl;
+        SequentialFile<Record, string> file("datos.dat", "auxiliar.dat",
+                []( Record const&a, Record const&b) { return strcmp(a.name,b.name) < 0 ;},
+                []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) > 0 ;},
+                []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) == 0 ;},
+                []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) == 0 ;},
+                []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) < 0 ;},
+                []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) > 0 ;}
+                );
 
-    vector<Record> result = file.range_search("Carlos", "Saulo");
-    for (auto i : result) i.showData();
+        vector<Record> result = file.range_search("Carlos", "Saulo");
+        for (auto i : result) i.showData();
 
-    cout << "Busqueda por llave:\n";
-    Record* recordP = file.search("Abel");
-    if (recordP) recordP->showData();
-    else cout << "No existe este registro\n";
+        cout << "Busqueda por llave:\n";
+        Record* recordP = file.search("Abel");
+        if (recordP) recordP->showData();
+        else cout << "No existe este registro\n";
+        
+        cout << "Llave existente:\n";
+        recordP = file.search("Jorge");
+        if (recordP) recordP->showData();
+        else cout << "No existe este registro\n";
+
+        cout << "Llave inexistente:\n";
+        recordP = file.search("Alejo");
+        if (recordP) recordP->showData();
+        else cout << "No existe este registro\n\n";
+
+        cout << "ReadRecord:\n";
+        file.readRecord(1,'d').showData();
+    }else{
+        cout<<"No implementado"<<endl;
+    }
     
-    cout << "Llave existente:\n";
-    recordP = file.search("Jorge");
-    if (recordP) recordP->showData();
-    else cout << "No existe este registro\n";
-
-    cout << "Llave inexistente:\n";
-    recordP = file.search("Alejo");
-    if (recordP) recordP->showData();
-    else cout << "No existe este registro\n\n";
-
-    cout << "ReadRecord:\n";
-    file.readRecord(1,'d').showData();
 
 }
 int main(){
