@@ -206,9 +206,9 @@ void AVLFile<T,TK>::insert(long pos_node, T record, fstream& file){
         if(RecordCurrent.left == -1){
             file.seekp(0, ios::end);
             RecordCurrent.left = file.tellg();
-            file.write((char*)&record, sizeof(Record));
+            file.write((char*)&record, sizeof(T));
             file.seekg(pos_node, ios::beg);
-            file.write((char*)&RecordCurrent, sizeof(Record));
+            file.write((char*)&RecordCurrent, sizeof(T));
         }
         else
             insert(RecordCurrent.left, record, file);
@@ -216,9 +216,9 @@ void AVLFile<T,TK>::insert(long pos_node, T record, fstream& file){
         if(RecordCurrent.right == -1){
             file.seekp(0, ios::end);
             RecordCurrent.right = file.tellg();
-            file.write((char*)&record, sizeof(Record));
+            file.write((char*)&record, sizeof(T));
             file.seekg(pos_node, ios::beg);
-            file.write((char*)&RecordCurrent, sizeof(Record));
+            file.write((char*)&RecordCurrent, sizeof(T));
         }
         else
             insert(RecordCurrent.right, record, file);
@@ -279,7 +279,7 @@ bool AVLFile<T,TK>::remove(long pos_node, TK key, fstream& file){
             long successorPos = maxleft(record.left, file);
             T succesor;
             file.seekg(successorPos,ios::beg);
-            file.read((char*)&succesor,sizeof(Record));
+            file.read((char*)&succesor,sizeof(T));
             remove(successorPos,get_key(succesor),file);//remove(successorPos,succesor.cod,file);
 
             succesor.right = record.right;
@@ -290,7 +290,7 @@ bool AVLFile<T,TK>::remove(long pos_node, TK key, fstream& file){
                 succesor.left = -1;
             }
             file.seekp(pos_node, ios::beg);
-            file.write((char*)&succesor,sizeof(Record));
+            file.write((char*)&succesor,sizeof(T));
             flag = true;
         }
     }
@@ -464,7 +464,7 @@ void AVLFile<T,TK>::right_rota(long pos_node, fstream& file){
     file.write((char*)&temp, sizeof(T));
 
     file.seekg(pos_temp, ios::beg);
-    file.write((char*)&record, sizeof(Record));
+    file.write((char*)&record, sizeof(T));
 
     updateHeight(pos_node, file);
     updateHeight(pos_temp, file);
