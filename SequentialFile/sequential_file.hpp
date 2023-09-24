@@ -3,41 +3,9 @@
 #include <fstream>
 #include <vector>
 #include <functional>
+#include "../Record_sequential.h"
 
 using namespace std;
-
-//struct Record {
-//    int id;
-//    char name[20];
-//    char surname[20];
-//    int ciclo;
-//    int next;
-//    char archivo;
-//
-//    void setData() {
-//        cout << "ID: "; cin >> id;
-//        cout << "Name: "; cin >> name;
-//        cout << "Surname: "; cin >> surname;
-//        cout << "Ciclo: "; cin >> ciclo;
-//        next = -1;
-//        archivo = 'd';
-//    }
-//    void setData(int id_, string name_, string surname_, int ciclo_) {
-//        this->id = id_;
-//        strcpy(this->name, name_.c_str());
-//        strcpy(this->surname, surname_.c_str());
-//        this->ciclo = ciclo_;
-//        next = -1;
-//        archivo = 'd';
-//    }
-//    void showData() {
-//        cout << "ID: " << id << "\n";
-//        cout << "Name: " << name << "\n";
-//        cout << "Surname: " << surname << "\n";
-//        cout << "Ciclo: " << ciclo << "\n";
-//        cout << "Next: " << next << archivo << "\n\n";
-//    }
-//};
 
 template <class T, typename TK>
 class SequentialFile {
@@ -49,36 +17,55 @@ class SequentialFile {
     std::function<bool(const T &, const TK &)> equal_key;
     std::function<bool(const T &, const TK &)> less_key;
     std::function<bool(const T &, const TK &)> greater_key;
+    static SequentialFile<T, TK>* instance;
 public:
     SequentialFile(string filename1, string filename2,
-                    function<bool(const T &, const T &)> less,
-                    function<bool(const T &, const T &)> greater,
-                    function<bool(const T &, const T & )> equal,
-                    function<bool(const T &, const TK &)> equal_key,
-                    function<bool(const T &, const TK &)> less_key,
-                    function<bool(const T &, const TK &)> greater_key);
+                   function<bool(const T &, const T &)> less,
+                   function<bool(const T &, const T &)> greater,
+                   function<bool(const T &, const T & )> equal,
+                   function<bool(const T &, const TK &)> equal_key,
+                   function<bool(const T &, const TK &)> less_key,
+                   function<bool(const T &, const TK &)> greater_key);
 
     Record readRecord(int pos, char fileChar);
+    static SequentialFile<T, TK>& getInstance(string filename1, string filename2,
+                                              function<bool(const T &, const T &)> less,
+                                              function<bool(const T &, const T &)> greater,
+                                              function<bool(const T &, const T &)> equal,
+                                              function<bool(const T &, const TK &)> equal_key,
+                                              function<bool(const T &, const TK &)> less_key,
+                                              function<bool(const T &, const TK &)> greater_key) {
+        static SequentialFile<T, TK> instance(filename1, filename2, less, greater, equal, equal_key, less_key, greater_key);
+        return instance;
+    }
 
     int size_datos();
     int size_auxiliar();
-
     vector<Record> reorganizar();
+
 
     bool insert(Record record);
     bool remove(TK key);
-    
-    Record* search(TK key);
+    vector<Record> search(TK key);
+   // Record* search(TK key);
     vector<Record> range_search(TK key1, TK key2);
+    ~SequentialFile() {
+        delete instance;
+    }
 };
+
+template <class T, typename TK>
+SequentialFile<T, TK>* SequentialFile<T, TK>::instance = nullptr;
+
+
 template <class T, typename TK>
 SequentialFile<T, TK>::SequentialFile(string filename1, string filename2,
-                    std::function<bool(const T &, const T &)> less,
-                    std::function<bool(const T &, const T &)> greater,
-                    std::function<bool(const T &, const T & )> equal,
-                    std::function<bool(const T &, const TK &)> equal_key,
-                    std::function<bool(const T &, const TK &)> less_key,
-                    std::function<bool(const T &, const TK &)> greater_key) {
+                                      std::function<bool(const T &, const T &)> less,
+                                      std::function<bool(const T &, const T &)> greater,
+                                      std::function<bool(const T &, const T & )> equal,
+                                      std::function<bool(const T &, const TK &)> equal_key,
+                                      std::function<bool(const T &, const TK &)> less_key,
+                                      std::function<bool(const T &, const TK &)> greater_key) {
     this->datos = filename1;
     this->auxiliar = filename2;
     this->less = less;
@@ -127,11 +114,11 @@ template <class T, typename TK>
 int SequentialFile<T, TK>::size_datos() {
     fstream file(this->datos, ios::in | ios::binary);
     if (!file.is_open()) throw("No se pudo abrir el archivo");
-    
+
     file.seekg(0, ios::end);
     int size = file.tellg();
     file.close();
-    
+
     return size / sizeof(Record);
 }
 
@@ -139,13 +126,14 @@ template <class T, typename TK>
 int SequentialFile<T, TK>::size_auxiliar() {
     fstream file(this->auxiliar, ios::in | ios::binary);
     if (!file.is_open()) throw("No se pudo abrir el archivo");
-    
+
     file.seekg(0, ios::end);
     int size = file.tellg();
     file.close();
-    
+
     return size / sizeof(Record);
 }
+
 
 template <class T, typename TK>
 vector<Record> SequentialFile<T, TK>::reorganizar() {
@@ -192,8 +180,9 @@ vector<Record> SequentialFile<T, TK>::reorganizar() {
     ofstream file2(this->datos);
 
     file2.seekp(0, ios::beg);
-    for (auto& r : records) {
+    for (auto r : records) {
         r.archivo = 'd';
+        r.showData();
         file2.write((char*) &r, sizeof(Record));
     }
 
@@ -202,8 +191,7 @@ vector<Record> SequentialFile<T, TK>::reorganizar() {
     ofstream auxFile2(this->auxiliar, ios::trunc);
     auxFile2.close();
 
-    // Retorna el vector de registros
-    return records;
+    return records;  // Devuelve el vector de records
 }
 
 
@@ -216,6 +204,7 @@ bool SequentialFile<T, TK>::insert(Record record) {
     if (size_datos() == 0) {
         // Se guarda un puntero al inicio de todos los datos
         Record cabecera;
+        //cabecera.setData(2, "nombre", "apellido", 1);
         cabecera.setData(2, "nombre", 100, 20,"alianza","peru");
         cabecera.next = 1;
         file.seekp(0, ios::end);
@@ -262,7 +251,7 @@ bool SequentialFile<T, TK>::insert(Record record) {
             file.read((char *)&current, sizeof(current));
             int siguiente = current.next;
             char archivo = current.archivo;
-            
+
             // Verificado
             if (current.archivo == 'a') {
                 fstream aux(this->auxiliar, ios::binary | ios::in | ios::out);
@@ -308,6 +297,7 @@ bool SequentialFile<T, TK>::insert(Record record) {
 
                 if (size_auxiliar() == 20) reorganizar();
 
+
                 return true;
             }
             file.close();
@@ -323,13 +313,10 @@ template <class T, typename TK>
 bool SequentialFile<T, TK>::remove(TK key) {
     fstream file (this->datos, ios::in | ios::out | ios::binary);
     if (!file.is_open()) return false;
-    // Al momento de eliminar, reemplazaremos el puntero con -1a ya que el últimos elemento siempre apunta a -1d
-    
-    // Primero validamos si el registro a eliminar es el primero
+
     Record cabecera;
     file.read((char*) &cabecera, sizeof(Record));
 
-    // Ahora leemos ese registro
     Record record = readRecord(cabecera.next, cabecera.archivo), auxRecord;
     if (equal_key(record, key)) {
         cabecera.next = record.next;
@@ -340,12 +327,12 @@ bool SequentialFile<T, TK>::remove(TK key) {
 
         reorganizar();
         return true;
-    } // En caso no sea el primero, deberemos buscar su predecesor
+    }
     else {
         fstream auxFile (this->auxiliar, ios::in | ios::out | ios::binary);
 
         char fileChar = 'd', auxChar; int pos = 1, auxPos;
-        
+
         do {
             auxRecord = readRecord(record.next, record.archivo);
             if (equal_key(auxRecord, key)) {
@@ -380,7 +367,7 @@ bool SequentialFile<T, TK>::remove(TK key) {
 
                 file.close();
                 auxFile.close();
-                
+
                 reorganizar();
                 return true;
             }
@@ -393,36 +380,65 @@ bool SequentialFile<T, TK>::remove(TK key) {
 }
 
 template <class T, typename TK>
-Record* SequentialFile<T, TK>::search(TK key) {
-    fstream file (this->datos, ios::in | ios::out | ios::binary);
+vector<Record> SequentialFile<T, TK>::search(TK key) {
+    fstream file(this->datos, ios::in | ios::binary);
+    vector<Record> results;
     Record result;
     int l = 1, u = size_datos() - 1, m;
-    
+
     while (u >= l) {
-        m = (l+u) / 2;
-        file.seekg(sizeof(Record)*m, ios::beg);
+        m = (l + u) / 2;
+        file.seekg(sizeof(Record) * m, ios::beg);
         file.read((char*)&result, sizeof(Record));
-        if (greater_key(result,key)) u = m - 1;
-        else if (less_key(result,key)) l = m + 1;
-        else break;
+        if (greater_key(result, key)) {
+            u = m - 1;
+        } else if (less_key(result, key)) {
+            l = m + 1;
+        } else {
+
+            results.push_back(result);
+
+            for (int i = m - 1; i >= l; i--) {
+                file.seekg(sizeof(Record) * i, ios::beg);
+                file.read((char*)&result, sizeof(Record));
+                if (equal_key(result, key)) {
+                    results.push_back(result);
+                } else {
+                    break;
+                }
+            }
+
+            for (int i = m + 1; i <= u; i++) {
+                file.seekg(sizeof(Record) * i, ios::beg);
+                file.read((char*)&result, sizeof(Record));
+                if (equal_key(result, key)) {
+                    results.push_back(result);
+                } else {
+                    break;
+                }
+            }
+            break;
+        }
     }
+
     file.close();
 
-    if (!equal_key(result,key)) {
-        fstream auxFile (this->auxiliar, ios::in | ios::out | ios::binary);
-        if (!auxFile.is_open()) throw ("No se pudo abrir el archivo auxiliar");
-        for (int i = 0; i < size_auxiliar(); i++) {
-            auxFile.read((char*)& result, sizeof(Record));
-            if (equal_key(result,key)) break;
+    if (results.empty()) {
+        fstream auxFile(this->auxiliar, ios::in | ios::binary);
+        if (!auxFile.is_open()) throw("No se pudo abrir el archivo auxiliar");
+        while (auxFile.read((char*)&result, sizeof(Record))) {
+            if (equal_key(result, key)) {
+                results.push_back(result);
+            }
         }
         auxFile.close();
     }
-    Record* r = new Record;
 
-    //Preguntar acaaaa
-    r->setData(result.player_id, result.short_name, result.value_eur, result.age,result.club_name,result.nationality_name);
-    return (equal_key(result,key))? r : nullptr;
+    return results;
 }
+
+
+
 
 template <class T, typename TK>
 vector<Record> SequentialFile<T, TK>::range_search(TK key1, TK key2) {
@@ -468,7 +484,7 @@ vector<Record> SequentialFile<T, TK>::range_search(TK key1, TK key2) {
         while (less_key(current,key2) || equal_key(current,key2)) { //a <= key2
             if (greater_key(current,key1) || equal_key(current,key1)) result.push_back(current); //a >= key1
             if (current.next == -1) break;
-            
+
             if (current.archivo == 'a') {
                 aux.seekg(current.next * sizeof(Record), ios::beg);
                 aux.read((char *)&current, sizeof(current));
@@ -483,4 +499,3 @@ vector<Record> SequentialFile<T, TK>::range_search(TK key1, TK key2) {
         return result;
     }
 }
-

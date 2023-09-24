@@ -1,11 +1,9 @@
 //
-// Created by JLeandroJM on 23/09/23.
+// Created by JLeandroJM on 24/09/23.
 //
 
-#ifndef BD2_PROJECT1_RECORD_H
-#define BD2_PROJECT1_RECORD_H
-
-
+#ifndef BD2_PROJECT1_RECORD_AVL_H
+#define BD2_PROJECT1_RECORD_AVL_H
 #include <iostream>
 #include <cstring>
 #include <fstream>
@@ -13,8 +11,7 @@
 #include <functional>
 
 using namespace std;
-
-struct Record {
+struct Record_avl {
     int player_id;
     char short_name[50];
     int value_eur;
@@ -23,6 +20,8 @@ struct Record {
     char nationality_name[50];
     int next;
     char archivo;
+    long left = -1, right = -1;
+    int height = 0;
 
 
     void setData(int player_id_, const char* short_name_, int value_eur_, int age_, const char* club_name_, const char* nationality_name_) {
@@ -47,5 +46,4 @@ struct Record {
         cout << "Next: " << next << archivo << "\n\n";
     }
 };
-
-#endif //BD2_PROJECT1_RECORD_H
+#endif //BD2_PROJECT1_RECORD_AVL_H

@@ -23,7 +23,7 @@ SequentialFile<T, TK>::SequentialFile(string filename1, string filename2,
 int main() {
 
     //Key ciclo
-    SequentialFile<Record, int> file("datos.dat", "auxiliar.dat",
+    SequentialFile<Record, int> file("datos4.dat", "auxiliar4.dat",
                 []( Record const&a, Record const&b) { return a.ciclo < b.ciclo;},
                 []( Record const&a,  Record const&b) { return a.ciclo > b.ciclo;},
                 []( Record const&a,  Record const&b) { return a.ciclo == b.ciclo;},
@@ -110,10 +110,10 @@ int main() {
     // if (file.remove("Jorge")) cout << "Se elimino Jorge\n";
     // else cout << "No se elimino Jorge\n";
     cout << "Reorganizar\n:";
-    vector<Record> registrosOrdenados = file.reorganizar();
-    for ( Record& registro : registrosOrdenados) {
-        registro.showData();
-    }
-//    file.reorganizar();
+//    vector<Record> registrosOrdenados = file.reorganizar();
+//    for ( Record& registro : registrosOrdenados) {
+//        registro.showData();
+//    }
+    file.reorganizar();
     return 0;
 }
