@@ -18,7 +18,7 @@ Paso 3:
 - Como la inserccion lo estamos haciendo siguiendo un lineamiento de un árbol digital, insertaremos a la izquierda si el la posicion en donde se evalue el binario es 0 y derecha si es 1, de esta forma los buckets se encontraran en las hojas.
   
 <p align="center">
-  <img width="654" alt="image" src="https://github.com/MatiasMaravi/BD2-Project1/assets/90939274/7e909c2e-4e03-4719-978d-bdf213a60717">
+  <img width="670" alt="image" src="https://github.com/MatiasMaravi/BD2-Project1/assets/90939274/09dad397-9a82-4bf1-8f71-b44d94555508">
 </p>
   
 Paso 4:
@@ -33,6 +33,31 @@ Paso 4:
 <p align="center">
   <img width="404" alt="image" src="https://github.com/MatiasMaravi/BD2-Project1/assets/90939274/b8872adf-aaf5-4fed-ab34-52142fd35755">
 </p>
+
+#### Busqueda:
+
+En el algoritmo de busqueda, primero hashearemos la llave a travez de la cual vamos a buscar, luego recorremos el arbol digital, dependiendo el valor que obtendremos en el binario, si es o avanzaremos por la rama izquierda sino iremos por la derecha, en caso no se encuentre la llave, devolvera un valor sin nada.
+
+#### Eliminacion:
+
+En el algoritmo de Eliminación utilizaremos el algoritmo de busqueda ya que buscaremos la llave a eliminar en el extendible y procederemos a eliminarlo, reduciremos el numero de elementos en el bucket por lo que si se inserta un nuevo elemento en el bucket, este reescribira al registro que ya esta eliminado.
+
+#### Ventajas y desventajas:
+
+##### Ventajas:
+
+- No hay problema de pérdida de datos ya que la capacidad de almacenamiento aumenta dinámicamente.
+- Con los cambios dinámicos en la función hash, los valores antiguos asociados se repiten con la nueva función hash.
+
+##### Desventajas:
+
+- El numero de buckets puede aumentar significativamente si se aplican hash a varios registros en el mismo bucket manteniendo la distribución de registros no uniforme.
+- Desperdicio de memoria debido a que ciertos depósitos contienen más datos que otros.
+
+
+
+
+
 
 
   
