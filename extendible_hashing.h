@@ -2,7 +2,8 @@
 #include <vector>
 #include <fstream>
 #include <cmath>
-
+#include <string>
+#include<cstring>
 using namespace std;
 unsigned long long D = 3;
 

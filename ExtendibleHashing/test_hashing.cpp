@@ -1,9 +1,24 @@
-#include "extendible_hashing.h"
+
+#include "extendible_hashing.hpp"
 #include<fstream> 
 #include <iostream>
 #include <sstream>
 using namespace std;
 
+unsigned long hash_int(int key){
+    return key%(1ULL<<D);
+}
+
+unsigned long hash_string(const std::string& str) {
+    unsigned long hash = 5381;
+    
+    for (char c : str) {
+        hash = ((hash << 5) + hash) + static_cast<unsigned char>(c);
+    }
+    
+    return hash_int(hash);
+}
+template<typename T,typename TK>
 void cargar_hash(){
     std::ifstream archivo("dataset.csv"); // Abre el archivo CSV
     if (!archivo.is_open()) throw std::runtime_error("No se pudo abrir el archivo.");
@@ -14,7 +29,7 @@ void cargar_hash(){
 
     std::string linea;
 
-    DynamicHash dh("buckets.dat","indices.dat");
+    DynamicHash<T,TK> dh("buckets.dat","indices.dat");
     
     
     // Leer el archivo línea por línea
@@ -62,7 +77,11 @@ int main() {
     int contador=0;
     int num_linea=0;
 
-    DynamicHash dh("buckets.dat","indices.dat");
+    DynamicHash<Record,int> dh("buckets.dat","indices.dat",
+                                [](const Record& r){return r.id;},
+                                [](const int& number){return hash_int(number);},
+                                [](const Record& r, const int& number){return r.id==number;},
+                                226);
     
     
     // Leer el archivo línea por línea
