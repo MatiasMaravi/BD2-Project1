@@ -1,5 +1,7 @@
 prueba.cpp
 archive/
+.vscode
+.idea
 # Prerequisites
 *.d
 
