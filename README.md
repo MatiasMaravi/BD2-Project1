@@ -44,7 +44,7 @@ En el algoritmo de Eliminación utilizaremos el algoritmo de busqueda ya que bus
 
 ### Ventajas y desventajas:
 
-#### Ventajas:
+### Ventajas:
 
 - No hay problema de pérdida de datos ya que la capacidad de almacenamiento aumenta dinámicamente.
 - Con los cambios dinámicos en la función hash, los valores antiguos asociados se repiten con la nueva función hash.
