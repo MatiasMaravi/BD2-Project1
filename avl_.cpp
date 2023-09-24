@@ -65,11 +65,13 @@ public:
         file.close();
     }
 
-    template <class T>
-    void remove(T key){
-        fstream file(this->filename, ios::in | ios::out | ios::binary);
-        remove(pos_root, key, file);
+    template<typename TK>
+    bool remove(TK key) {
+        fstream file(this->filename, ios::binary | ios::in |ios::out);
+        if (!file.is_open()) throw std::runtime_error("No se pudo abrir el archivo");
+        bool flag = remove(pos_root, key,file);
         file.close();
+        return flag;
     }
 
     vector<Record> inorder(){
@@ -94,15 +96,15 @@ public:
 
 private:
     void inorder(long pos_node, vector<Record> &result, fstream &file){
-    if (pos_node == -1)
-        return;
-    file.seekg(pos_node, ios::beg);
-    Record record;
-    file.read((char*) &record, sizeof(Record));
+        if (pos_node == -1)
+            return;
+        file.seekg(pos_node, ios::beg);
+        Record record;
+        file.read((char*) &record, sizeof(Record));
 
-    inorder(record.left, result, file);
-    result.push_back(record);
-    inorder(record.right, result, file);
+        inorder(record.left, result, file);
+        result.push_back(record);
+        inorder(record.right, result, file);
     }   
 
     template<typename TK>
@@ -158,60 +160,124 @@ private:
     }
 
     template <class T>
-    void remove(long pos_node, T key, fstream& file){
-        if(pos_node == -1)
-            return;
-        Record curr_record;
-        file.seekg(pos_node, ios::beg);
-        file.read((char*)&curr_record, sizeof(Record));
-
-        if(key < curr_record.cod)
-            remove(curr_record.left, key, file);
-        else if(key > curr_record.cod)
-            remove(curr_record.right, key, file);
-        else{
-            if(curr_record.left == -1 && curr_record.right == -1){
-                curr_record.cod = -1;
-                file.seekp(pos_node, ios::beg);
-                file.write((char*)&curr_record, sizeof(Record));
-            }
-            else if(curr_record.left == -1){
-                Record right_record;
-                file.seekg(curr_record.right, ios::beg);
-                file.read((char*)&right_record, sizeof(Record));
-                curr_record.cod = right_record.cod;
-                curr_record.right = right_record.right;
-                curr_record.left = right_record.left;
-                file.seekp(pos_node, ios::beg);
-                file.write((char*)&curr_record, sizeof(Record));
-            }
-            else if(curr_record.right == -1){
-                Record left_record;
-                file.seekg(curr_record.left, ios::beg);
-                file.read((char*)&left_record, sizeof(Record));
-                curr_record.cod = left_record.cod;
-                curr_record.right = left_record.right;
-                curr_record.left = left_record.left;
-                file.seekp(pos_node, ios::beg);
-                file.write((char*)&curr_record, sizeof(Record));
-            }
-            else{
-                Record left_record;
-                file.seekg(curr_record.left, ios::beg);
-                file.read((char*)&left_record, sizeof(Record));
-                curr_record.cod = left_record.cod;
-                curr_record.right = left_record.right;
-                curr_record.left = left_record.left;
-                file.seekp(pos_node, ios::beg);
-                file.write((char*)&curr_record, sizeof(Record));
-                remove(curr_record.left, left_record.cod, file);
-
-            }
-        }
-        updateHeight(pos_node, file);
-        balance(pos_node, file);
-
+    bool remove(long pos_node, T key, fstream& file){
+    if (pos_node == -1) {
+        throw runtime_error("No hay elementos");
     }
+    Record record;
+    file.seekg(pos_node, ios::beg);
+    file.read((char*)&record, sizeof(Record));
+
+    bool flag = false;
+
+    if (record.cod < key) {
+        flag = remove(record.right, key, file);
+    } else if (record.cod > key) {
+        flag = remove(record.left, key, file);
+    } else {
+        if (record.left == -1 && record.right == -1) {
+            int fatherPo = searchFather(file,record.cod,pos_root);
+            Record RecordFather;
+            if (fatherPo == 0 && pos_node == 0){
+                pos_root = -1;
+            }
+            file.seekg(fatherPo, ios::beg);
+            file.read((char*)&RecordFather, sizeof(Record));
+            if (RecordFather.cod > record.cod) {
+                RecordFather.left = -1;
+
+            }else{
+                RecordFather.right = -1;
+            }
+            file.seekp(fatherPo * sizeof(Record),ios::beg);
+            file.write((char*)&RecordFather,sizeof(Record));
+
+            flag = true;
+        } else if (record.left == -1 || record.right == -1) {
+            Record Child;
+            if ( record.left == -1) {
+                file.seekg(record.right,ios::beg);
+                file.read((char*)& Child,sizeof(Record));
+            }else if (record.right == -1){
+                file.seekg(record.left,ios::beg);
+                file.read((char*)& Child,sizeof(Record));
+            }
+            file.seekp(pos_node * sizeof(Record),ios::beg);
+            file.write((char*)&Child,sizeof(Record));
+            flag = true;
+        } else {
+            long successorPos = maxleft(record.left, file);
+            Record succesor;
+            file.seekg(successorPos,ios::beg);
+            file.read((char*)&succesor,sizeof(Record));
+            remove(successorPos,succesor.cod,file);
+
+            succesor.right = record.right;
+            succesor.height = record.height;
+            succesor.left = record.left;
+
+            if (record.left == successorPos){
+                succesor.left = -1;
+            }
+            file.seekp(pos_node, ios::beg);
+            file.write((char*)&succesor,sizeof(Record));
+            flag = true;
+        }
+    }
+    if (flag){
+        updateHeight(pos_node,file);
+        balance(pos_node,file);
+    }
+    return flag;
+    }
+    long maxleft(long& pos_node, std::fstream &file) {
+    Record record;
+    file.seekg(pos_node,ios::beg);
+    file.read((char*)&record,sizeof(Record));
+    if (record.right == -1){
+        return  pos_node;
+    }else{
+        maxleft(record.right,file);
+    }
+    return -1;
+    }
+    template <typename TK>
+    long searchFather(fstream& file,TK& keyChild,long& pos_node){
+    Record father;
+    file.seekg(pos_node,ios::beg);
+    file.read((char*)&father,sizeof(Record));
+
+    long childleft = father.left;
+    long childRight = father.right;
+
+    Record Childleft;
+    file.seekg(childleft,ios::beg);
+    file.read((char*)&Childleft,sizeof(Record));
+
+    Record Childright;
+    file.seekg(childRight,ios::beg);
+    file.read((char*)&Childright,sizeof(Record));
+
+    long posFather= -1;
+    if (keyChild == Childleft.cod || keyChild == Childright.cod){
+        posFather =pos_node;
+    }
+
+    if (posFather != -1){
+        return posFather;
+    }else{
+        if (father.cod > keyChild){
+            searchFather<TK>(file,keyChild, childleft);
+        }else if(father.cod < keyChild){
+            searchFather<TK>(file,keyChild,childRight);
+        }else {
+            return 0;
+        }
+        return pos_node;
+        }
+    }
+
+
     void searchRange(long pos_node, int start, int end, vector<Record>& result, ifstream& file){
         if(pos_node == -1)
             return;
@@ -398,12 +464,19 @@ void Readrange(){
         re.showData();
     };
 };
+
 void Delete(){
     AVLFile file("data.bin");
     int Key;
     cout<<"Ingrese el codigo a borrar: "; cin>>Key;
-    file.remove(Key);
+    bool flag = file.remove(Key);
+    if (flag){
+        cout<<"Eliminado con exito"<<endl;
+    }else{
+        cout<<"No se pudo eliminar"<<endl;
+    }
 };
+
 string menu(){
     string op;
     cout<<"\n--------- Menu -----------\n";
