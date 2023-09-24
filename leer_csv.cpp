@@ -32,11 +32,14 @@ void cargar_hash(){
                     fila.push_back(token);
             }
 
+
                 Record r1;
-                r1.codigo=stoi(fila[0]);
-                r1.name=fila[1];
+                r1.id=stoi(fila[0]);
+                strcpy(r1.name,fila[1].c_str());
                 r1.value=stoi(fila[2]);
                 r1.age=stoi(fila[3]);
+                strcpy(r1.fecha,fila[4].c_str());
+                strcpy(r1.nacionalidad,fila[8].c_str());
                 dh.add(r1);
         
     }
@@ -48,7 +51,7 @@ void cargar_hash(){
 }
 
 int main() {
-    std::ifstream archivo("dataset.csv"); // Abre el archivo CSV
+    std::ifstream archivo("./Dataset/datos_1000.csv"); // Abre el archivo CSV
     if (!archivo.is_open()) {
         std::cerr << "No se pudo abrir el archivo." << std::endl;
         return 1;
@@ -73,7 +76,6 @@ int main() {
         std::string token;
         std::vector<std::string> fila;
         
-        if(num_linea%2!=0){
             while (std::getline(ss, token, ',')) {
                 // Verificar si el token está vacío o contiene solo comas
                     fila.push_back(token);
@@ -82,21 +84,17 @@ int main() {
             // Agregar la fila solo si contiene al menos un campo no vacío
 
                 datos.push_back(fila);
-                contador++;
+
 
                 Record r1;
-                r1.codigo=stoi(fila[0]);
-                r1.name=fila[1];
+                r1.id=stoi(fila[0]);
+                strcpy(r1.name,fila[1].c_str());
                 r1.value=stoi(fila[2]);
                 r1.age=stoi(fila[3]);
+                strcpy(r1.fecha,fila[4].c_str());
+                strcpy(r1.nacionalidad,fila[9].c_str());
                 dh.add(r1);
 
-
-            if (contador == 10) {
-                break;
-            }
-        }
-        num_linea++;
     }
 
     // Cerrar el archivo
@@ -112,7 +110,7 @@ int main() {
 
     cout<<"---------------------"<<endl;
 
-    Record r100= dh.search(192985);
+    Record r100= dh.search(223489);
     r100.print();
 
     

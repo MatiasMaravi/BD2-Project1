@@ -9,6 +9,7 @@ unsigned long long D = 3;
 unsigned long hash_int(int key){
     return key%(1ULL<<D);
 }
+
 unsigned long hash_string(const std::string& str) {
     unsigned long hash = 5381;
     
@@ -42,34 +43,34 @@ string to_binary(int n){
 // #define fb 226//4084/18
 //alumno
 struct Record{
-    int codigo;
-    string name;
+    int id;
+    char name[50];
     int value;
     int age;
-    void setData(){
-        cout<<"Codigo: ";cin>>codigo;
-        cout<<"Nombre: ";cin>>name;
-        cout<<"Valor: ";cin>>value;
-        cout<<"Edad: ";cin>>age;
-    }
+    char fecha[50];
+    int tamaño;
+    char club[50];
+    char nacionalidad[50];
 
-    Record(){
-        codigo = -1;
-        name = "";
-        value = 0;
-        age = 0;
-    }
-    Record(int codigo, string name, int ciclo, int age){
-        this->codigo = codigo;
-        this->name = name;
-        this->value = ciclo;
+
+    Record(){}
+
+    Record(int codigo, string name_, int valor_, int age, string _fecha, int _tamaño,string _nacionalidad){
+        this->id = codigo;
+        strcpy(this->name, name_.c_str());
+        this->value = valor_;
         this->age = age;
+        strcpy(this->fecha, _fecha.c_str());
+        this->tamaño = _tamaño;
+        strcpy(this->nacionalidad, _nacionalidad.c_str());
     }
     void print(){
-        cout<<"Codigo: "<<codigo<<endl;
+        cout<<"id: "<<id<<endl;
         cout<<"Nombre: "<<name<<endl;
-        cout<<"Ciclo: "<<value<<endl;
+        cout<<"valor: "<<value<<endl;
         cout<<"Edad: "<<age<<endl;
+        cout<<"Fecha: "<<fecha<<endl;
+        cout<<"Nacionalidad: "<<nacionalidad<<endl;
     }
 };
 
@@ -165,7 +166,7 @@ struct Bucket{
         cout<<"next: "<<next<<endl;
         cout<<endl;
         for (int i = 0;  i < count; i++) {
-            cout<<"Codigo: "<<records[i].codigo<<endl;
+            cout<<"Codigo: "<<records[i].id<<endl;
         }
         cout<<endl;
     }
@@ -223,7 +224,7 @@ class DynamicHash{
         fstream file2(fileName_index,ios::binary|ios::in|ios::out);
         if(!file.is_open()) return false;
         if(!file2.is_open()) return false;
-        string binario = to_binary(hash_int(record.codigo));
+        string binario = to_binary(hash_int(record.id));
         int indice = 0;
         int pos = 0;
         if (binario[indice]=='0')pos = 0;
@@ -246,7 +247,7 @@ class DynamicHash{
             // Recorrer bucket y agregar a los nuevos buckets
             indice++;
             for (int i = 0; i < bucket.count; i++){
-                string bin = to_binary(hash_int(bucket.records[i].codigo));
+                string bin = to_binary(hash_int(bucket.records[i].id));
                 if(bin[indice]=='0'){
                     bucket1.records[bucket1.count] = bucket.records[i];
                     bucket1.count++;
@@ -302,6 +303,12 @@ class DynamicHash{
 
         }
         else{
+            enlazar_bucket(file,post_bucket,record);
+        }
+
+    }
+
+    bool enlazar_bucket(fstream &file,int post_bucket,Record record){
             Bucket bucket;
             file.seekg(post_bucket,ios::beg);
             bucket.read(file);
@@ -320,9 +327,27 @@ class DynamicHash{
             bucket.next = pos1_buck;
             file.seekp(post_bucket,ios::beg);
             bucket.write(file);
-        }
-
+            return true;
     }
+
+    bool add(fstream &file,int post_bucket,Record record){
+        Bucket bucket2;
+        file.seekg(post_bucket,ios::beg);
+        bucket2.read(file);
+        if(bucket2.count<bucket2.capacity){
+            bucket2.records[bucket2.count] = record;
+            bucket2.count++;
+            file.seekp(post_bucket,ios::beg);
+            bucket2.write(file);
+            return true;
+        }
+        else if(bucket2.next!=-1){
+            return add(file,bucket2.next,record);
+        }
+        else{
+            return enlazar_bucket(file,post_bucket,record);
+        }
+}
 
 
     bool add(fstream &file, fstream &file2,string binario, int &pos, Record record,int &indice){
@@ -344,20 +369,7 @@ class DynamicHash{
                 return true;
             }
             else if(bucket.next!=-1){
-                Bucket bucket2;
-                file.seekg(bucket.next,ios::beg);
-                bucket2.read(file);
-                if(bucket2.count<bucket2.capacity){
-                    bucket2.records[bucket2.count] = record;
-                    bucket2.count++;
-                    file.seekp(bucket.next,ios::beg);
-                    bucket2.write(file);
-                    return true;
-                }
-                else{
-                    aumentar_buckets(file,file2,pos,bucket.next,binario,indice,record);
-                    return true;
-                }
+                    return add(file,bucket.next,record);
             }
             else{
                 aumentar_buckets(file,file2,pos,post_bucket,binario,indice,record);
@@ -379,12 +391,11 @@ class DynamicHash{
 
 
     Record search(fstream &file,int pos,int key){
-    
         file.seekg(pos,ios::beg);
         Bucket bucket;
         bucket.read(file);
         for (int i = 0; i < bucket.count; i++){
-            if(bucket.records[i].codigo==key){
+            if(bucket.records[i].id==key){
                 return bucket.records[i];
             }
         }
@@ -407,7 +418,7 @@ class DynamicHash{
             Bucket bucket;
             bucket.read(file);
             for (int i = 0; i < bucket.count; i++){
-                if(bucket.records[i].codigo==key){
+                if(bucket.records[i].id==key){
                     return bucket.records[i];
                 }
             }
@@ -473,7 +484,7 @@ class DynamicHash{
             Bucket bucket;
             bucket.read(file);
             for (int i = 0; i < bucket.count; i++){
-                if(bucket.records[i].codigo==key){
+                if(bucket.records[i].id==key){
                     bucket.records[i] = bucket.records[bucket.count-1];
                     bucket.count--;
                     file.seekp(post_bucket,ios::beg);
@@ -486,7 +497,7 @@ class DynamicHash{
                 file.seekg(bucket.next,ios::beg);
                 bucket2.read(file);
                 for (int i = 0; i < bucket2.count; i++){
-                    if(bucket2.records[i].codigo==key){
+                    if(bucket2.records[i].id==key){
                         bucket2.records[i] = bucket2.records[bucket2.count-1];
                         bucket2.count--;
                         file.seekp(bucket.next,ios::beg);
