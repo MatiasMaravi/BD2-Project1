@@ -38,4 +38,5 @@ public:
         return recordVector;
     }
 };
-#endif //BD2_PROJECT1_RECORD_H
+
+#endif

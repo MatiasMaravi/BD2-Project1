@@ -13,36 +13,33 @@
 
 class Button : public sf::Drawable {
 private:
-    sf::RectangleShape rectangle;
-    sf::Text text;
-    sf::Font font;
+
+    sf::Sprite sprite;
     std::function<void()> onClick;
+    sf::Texture buttonTexture;
+
 
 public:
-    Button(float x, float y, float width, float height, const std::string& buttonText)
+    Button(float x, float y, float width, float height,const std::string& texturePath)
             : onClick(nullptr) {
-        rectangle.setPosition(x, y);
-        rectangle.setSize(sf::Vector2f(width, height));
-        rectangle.setFillColor(sf::Color::Blue);
 
-        if (!font.loadFromFile("../interfaz/Arial.ttf")) {
-            std::cerr << "No se pudo cargar la fuente Arial.ttf" << std::endl;
+
+        if (!buttonTexture.loadFromFile(texturePath)) {
+            // Manejar un error si la carga de textura falla
+            std::cerr << "Error al cargar la textura desde " << texturePath << std::endl;
         }
 
-        text.setFont(font);
-        text.setCharacterSize(20);
-        text.setFillColor(sf::Color::White);
-        text.setString(buttonText);
-        text.setPosition(x + 10, y + 10); // Ajusta la posición del texto dentro del botón
+        sprite.setTexture(buttonTexture);
+        sprite.setPosition(x, y);
+        sprite.setScale(width / buttonTexture.getSize().x, height / buttonTexture.getSize().y);
 
-        // Añade un evento de clic vacío por defecto
         onClick = []() {};
     }
 
     void handleEvent(sf::Event event, sf::Vector2f mousePosition) {
         if (event.type == sf::Event::MouseButtonPressed &&
             event.mouseButton.button == sf::Mouse::Left) {
-            if (rectangle.getGlobalBounds().contains(mousePosition)) {
+            if (sprite.getGlobalBounds().contains(mousePosition)) {
                 // Llama a la función de clic si el botón se presiona
                 onClick();
             }
@@ -50,12 +47,18 @@ public:
     }
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-        target.draw(rectangle, states);
-        target.draw(text, states);
+
+        target.draw(sprite, states);
+        ;
     }
 
     void setOnClick(std::function<void()> clickFunction) {
         onClick = clickFunction;
     }
+
+    sf::FloatRect getGlobalBounds() const {
+        return sprite.getGlobalBounds();
+    }
+
 };
 #endif //BD2_PROJECT1_BUTTON_H

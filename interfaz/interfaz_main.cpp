@@ -1,15 +1,17 @@
-
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include "record_.h"
 #include "button.h"
 #include "textinput.h"
-#include "../Parser/Parser.hpp"
+
 
 int main(){
-    // Inicializa la semilla del generador de números aleatorios
+
+
+
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     // Define las dimensiones de la tabla
@@ -19,21 +21,44 @@ int main(){
     const float cellHeight = 30.f;
 
     // Crear una ventana de SFML
-    sf::RenderWindow window(sf::VideoMode(1100, 700), "Tabla de Registros");
-    TextInput input(200, 40, 870, 300);
+    sf::RenderWindow window(sf::VideoMode(1100, 720), "Tabla de Registros");
+    TextInput input(240, 42, 858, 300);
     std::string savedText;
-    Button button(500, 0, 100, 40, "Execute");
 
-    button.setOnClick([&input, &savedText]() {
+    Button button_execute(180.f, 280.f, 50.f, 50.f,"../interfaz/execute.png");
+    Button button_equis(1040.f, 2.f, 35.f, 35.f,"../interfaz/close-icon-30.png");
+    Button button_tabla_1(40.f, 100.f, 60.f, 50.f,"../interfaz/tabla.png");
+    Button button_tabla_2(40.f, 200.f, 60.f, 50.f,"../interfaz/tabla.png");
+    sf::RectangleShape rectangle_arriba;
+    rectangle_arriba.setSize(sf::Vector2f(1100, 8));
+    rectangle_arriba.setPosition(0, 0);
+    rectangle_arriba.setFillColor(sf::Color(236, 190, 58));
+    rectangle_arriba.setOutlineThickness(2);
+    rectangle_arriba.setOutlineColor(sf::Color::Black);
+
+    sf::RectangleShape rectangle_abajo;
+    rectangle_abajo.setSize(sf::Vector2f(1100, 40));
+    rectangle_abajo.setPosition(0, 682);
+    rectangle_abajo.setFillColor(sf::Color(141, 105, 0));
+    rectangle_abajo.setOutlineThickness(2);
+    rectangle_abajo.setOutlineColor(sf::Color::Black);
+
+    sf::RectangleShape rectangle_medio;
+    rectangle_arriba.setSize(sf::Vector2f(1100, 40));
+    rectangle_arriba.setPosition(0, 0);
+    rectangle_arriba.setFillColor(sf::Color(236, 190, 58));
+
+
+
+
+    button_execute.setOnClick([&input, &savedText]() {
         std::string text = input.getText();
         savedText = text;
         std::cout << "Botón clickeado. Texto guardado: " << savedText << std::endl;
-        Scanner scanner(savedText.c_str());
-        Parser parser(&scanner);
-        if(!parser.parse()) cout << "Parse error" << endl;
-        else cout << "Parse success" << endl;
+
         input.clearText();
     });
+
 
 
     // Crear una fuente para el texto
@@ -44,12 +69,12 @@ int main(){
     }
 
     // Crear objetos Record y almacenarlos en un vector
-//     std::vector<Record> records;
-//     for (int i = 0; i < numRows; ++i) {
-//         Record record('A' + i, "Texto " + std::to_string(i), i * 10, i * 20, i * 30, i * 40);
-//         records.push_back(record);
-//     }
-// // 
+    std::vector<Record> records;
+    for (int i = 0; i < numRows; ++i) {
+        Record record('A' + i, "Texto " + std::to_string(i), i * 10, i * 20, i * 30, i * 40);
+        records.push_back(record);
+    }
+
     // Nombres de las cabeceras
     std::vector<std::string> columnHeaders = {"Char", "String", "Int1", "Int2", "Int3", "Int4"};
 
@@ -58,14 +83,22 @@ int main(){
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
-            }else {
-                button.handleEvent(event, sf::Vector2f(sf::Mouse::getPosition(window)));
+            }
+
+            else {
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                    sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+                    if (button_equis.getGlobalBounds().contains(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y))) {
+                        window.close();
+                    }}
+
+                button_execute.handleEvent(event, sf::Vector2f(sf::Mouse::getPosition(window)));
                 input.handleEvent(event, sf::Vector2f(sf::Mouse::getPosition(window)));
             }
 
         }
 
-        window.clear(sf::Color::White);
+        window.clear(sf::Color(255, 240, 196));
 
 
         // Dibujar las cabeceras de las columnas
@@ -86,30 +119,36 @@ int main(){
         }
 
         // Dibujar los registros en la tabla
-        // for (int i = 0; i < numRows; ++i) {
-        //     std::vector<std::string> recordValues = records[i].toVector();
-        //     for (int j = 0; j < numColumns; ++j) {
-        //         sf::RectangleShape cell(sf::Vector2f(cellWidth, cellHeight));
-        //         cell.setPosition((j * cellWidth)+100, ((i + 1) * cellHeight)+350); // Offset por la cabecera
-        //         cell.setOutlineColor(sf::Color::Black);
-        //         cell.setOutlineThickness(1);
-        //         window.draw(cell);
+        for (int i = 0; i < numRows; ++i) {
+            std::vector<std::string> recordValues = records[i].toVector();
+            for (int j = 0; j < numColumns; ++j) {
+                sf::RectangleShape cell(sf::Vector2f(cellWidth, cellHeight));
+                cell.setPosition((j * cellWidth)+100, ((i + 1) * cellHeight)+350); // Offset por la cabecera
+                cell.setOutlineColor(sf::Color::Black);
+                cell.setOutlineThickness(1);
+                window.draw(cell);
 
-        //         sf::Text text;
-        //         text.setFont(font);
-        //         text.setString(recordValues[j]);
-        //         text.setCharacterSize(14);
-        //         text.setFillColor(sf::Color::Black);
-        //         text.setPosition((j * cellWidth) + 110, ((i + 1) * cellHeight + 10)+350); // Offset por la cabecera
-        //         window.draw(text);
-        //     }
-        // }
-        window.draw(button);
+                sf::Text text;
+                text.setFont(font);
+                text.setString(recordValues[j]);
+                text.setCharacterSize(14);
+                text.setFillColor(sf::Color::Black);
+                text.setPosition((j * cellWidth) + 110, ((i + 1) * cellHeight + 10)+350); // Offset por la cabecera
+                window.draw(text);
+            }
+        }
+        window.draw(button_execute);
+        window.draw(rectangle_arriba);
+        window.draw(rectangle_abajo);
+        window.draw(button_equis);
+        window.draw(button_tabla_1);
+        window.draw(button_tabla_2);
+
         window.draw(input);
+
 
         window.display();
     }
-return 0;
+    return 0;
 
 }
-

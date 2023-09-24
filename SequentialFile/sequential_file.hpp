@@ -6,38 +6,38 @@
 
 using namespace std;
 
-struct Record {
-    int id;
-    char name[20];
-    char surname[20];
-    int ciclo;
-    int next;
-    char archivo;
-
-    void setData() {
-        cout << "ID: "; cin >> id;
-        cout << "Name: "; cin >> name;
-        cout << "Surname: "; cin >> surname;
-        cout << "Ciclo: "; cin >> ciclo;
-        next = -1;
-        archivo = 'd';
-    }
-    void setData(int id_, string name_, string surname_, int ciclo_) {
-        this->id = id_;
-        strcpy(this->name, name_.c_str());
-        strcpy(this->surname, surname_.c_str());
-        this->ciclo = ciclo_;
-        next = -1;
-        archivo = 'd';
-    }
-    void showData() {
-        cout << "ID: " << id << "\n";
-        cout << "Name: " << name << "\n";
-        cout << "Surname: " << surname << "\n";
-        cout << "Ciclo: " << ciclo << "\n";
-        cout << "Next: " << next << archivo << "\n\n";
-    }
-};
+//struct Record {
+//    int id;
+//    char name[20];
+//    char surname[20];
+//    int ciclo;
+//    int next;
+//    char archivo;
+//
+//    void setData() {
+//        cout << "ID: "; cin >> id;
+//        cout << "Name: "; cin >> name;
+//        cout << "Surname: "; cin >> surname;
+//        cout << "Ciclo: "; cin >> ciclo;
+//        next = -1;
+//        archivo = 'd';
+//    }
+//    void setData(int id_, string name_, string surname_, int ciclo_) {
+//        this->id = id_;
+//        strcpy(this->name, name_.c_str());
+//        strcpy(this->surname, surname_.c_str());
+//        this->ciclo = ciclo_;
+//        next = -1;
+//        archivo = 'd';
+//    }
+//    void showData() {
+//        cout << "ID: " << id << "\n";
+//        cout << "Name: " << name << "\n";
+//        cout << "Surname: " << surname << "\n";
+//        cout << "Ciclo: " << ciclo << "\n";
+//        cout << "Next: " << next << archivo << "\n\n";
+//    }
+//};
 
 template <class T, typename TK>
 class SequentialFile {
@@ -62,8 +62,9 @@ public:
 
     int size_datos();
     int size_auxiliar();
-    void reorganizar();
-    
+
+    vector<Record> reorganizar();
+
     bool insert(Record record);
     bool remove(TK key);
     
@@ -147,10 +148,10 @@ int SequentialFile<T, TK>::size_auxiliar() {
 }
 
 template <class T, typename TK>
-void SequentialFile<T, TK>::reorganizar() {
+vector<Record> SequentialFile<T, TK>::reorganizar() {
     fstream file(this->datos, ios::in | ios::binary);
     fstream auxFile(this->auxiliar, ios::in | ios::binary);
-    
+
     if (!file.is_open() || !auxFile.is_open()) throw("No se pudo abrir el archivo");
 
     vector<Record> records;
@@ -191,9 +192,8 @@ void SequentialFile<T, TK>::reorganizar() {
     ofstream file2(this->datos);
 
     file2.seekp(0, ios::beg);
-    for (auto r : records) {
+    for (auto& r : records) {
         r.archivo = 'd';
-        r.showData();
         file2.write((char*) &r, sizeof(Record));
     }
 
@@ -201,7 +201,11 @@ void SequentialFile<T, TK>::reorganizar() {
 
     ofstream auxFile2(this->auxiliar, ios::trunc);
     auxFile2.close();
+
+    // Retorna el vector de registros
+    return records;
 }
+
 
 template <class T, typename TK>
 bool SequentialFile<T, TK>::insert(Record record) {
@@ -212,7 +216,7 @@ bool SequentialFile<T, TK>::insert(Record record) {
     if (size_datos() == 0) {
         // Se guarda un puntero al inicio de todos los datos
         Record cabecera;
-        cabecera.setData(2, "nombre", "apellido", 1);
+        cabecera.setData(2, "nombre", 100, 20,"alianza","peru");
         cabecera.next = 1;
         file.seekp(0, ios::end);
         file.write((char *)&cabecera, sizeof(record));
@@ -414,7 +418,9 @@ Record* SequentialFile<T, TK>::search(TK key) {
         auxFile.close();
     }
     Record* r = new Record;
-    r->setData(result.id, result.name, result.surname, result.ciclo);
+
+    //Preguntar acaaaa
+    r->setData(result.player_id, result.short_name, result.value_eur, result.age,result.club_name,result.nationality_name);
     return (equal_key(result,key))? r : nullptr;
 }
 
