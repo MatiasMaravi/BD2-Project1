@@ -22,24 +22,24 @@ SequentialFile<T, TK>::SequentialFile(string filename1, string filename2,
 */
 int main() {
     //Key name
-    // SequentialFile<Record, string> file("datos.dat", "auxiliar.dat",
-    //                 []( Record const&a, Record const&b) { return strcmp(a.name,b.name) < 0 ;},
-    //                 []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) > 0 ;},
-    //                 []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) == 0 ;},
-    //                 []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) == 0 ;},
-    //                 []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) < 0 ;},
-    //                 []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) > 0 ;}
-    //                 );
+    SequentialFile<Record, string> file("datos.dat", "auxiliar.dat",
+                    []( Record const&a, Record const&b) { return strcmp(a.name,b.name) < 0 ;},
+                    []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) > 0 ;},
+                    []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) == 0 ;},
+                    []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) == 0 ;},
+                    []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) < 0 ;},
+                    []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) > 0 ;}
+                    );
 
     //Key ciclo
-    SequentialFile<Record, int> file("datos.dat", "auxiliar.dat",
-                []( Record const&a, Record const&b) { return a.ciclo < b.ciclo;},
-                []( Record const&a,  Record const&b) { return a.ciclo > b.ciclo;},
-                []( Record const&a,  Record const&b) { return a.ciclo == b.ciclo;},
-                []( Record const&a,  int const&b) { return a.ciclo == b;},
-                []( Record const&a,  int const&b) { return a.ciclo < b;},
-                []( Record const&a,  int const&b) { return a.ciclo > b;}
-                );
+    // SequentialFile<Record, int> file("datos.dat", "auxiliar.dat",
+    //             []( Record const&a, Record const&b) { return a.ciclo < b.ciclo;},
+    //             []( Record const&a,  Record const&b) { return a.ciclo > b.ciclo;},
+    //             []( Record const&a,  Record const&b) { return a.ciclo == b.ciclo;},
+    //             []( Record const&a,  int const&b) { return a.ciclo == b;},
+    //             []( Record const&a,  int const&b) { return a.ciclo < b;},
+    //             []( Record const&a,  int const&b) { return a.ciclo > b;}
+    //             );
     Record record;
     record.setData(1, "Andres", "Perez", 1);
     file.insert(record);
@@ -64,29 +64,29 @@ int main() {
     record.setData(11, "Abel", "Perez", 12);
     file.insert(record);
 
-    // cout << "Datos.dat" << endl;
-    // fstream file1("datos.dat", ios::app | ios::in | ios::binary);
-    // Record cabecera;
-    // file1.seekg(0, ios::beg);
-    // file1.read((char *)&cabecera, sizeof(cabecera));
-    // cout << cabecera.next << " " << cabecera.archivo << endl;
-    // Record current;
-    // file1.read((char *)&current, sizeof(current));
-    // while (!file1.eof()) {
-    //     cout << current.id << " " << current.name << " " << current.surname << " " << current.ciclo << " " << current.next << " " << current.archivo << endl;
-    //     file1.read((char *)&current, sizeof(current));
-    // }
+    cout << "Datos.dat" << endl;
+    fstream file1("datos.dat", ios::app | ios::in | ios::binary);
+    Record cabecera;
+    file1.seekg(0, ios::beg);
+    file1.read((char *)&cabecera, sizeof(cabecera));
+    cout << cabecera.next << " " << cabecera.archivo << endl;
+    Record current;
+    file1.read((char *)&current, sizeof(current));
+    while (!file1.eof()) {
+        cout << current.id << " " << current.name << " " << current.surname << " " << current.ciclo << " " << current.next << " " << current.archivo << endl;
+        file1.read((char *)&current, sizeof(current));
+    }
 
-    // cout << endl;
+    cout << endl;
 
-    // cout << "Auxiliar.dat" << endl;
-    // fstream file2("auxiliar.dat", ios::app | ios::in | ios::binary);
-    // file2.seekg(0, ios::beg);
-    // file2.read((char *)&current, sizeof(current));
-    // while (!file2.eof()) {
-    //     cout << current.id << " " << current.name << " " << current.surname << " " << current.ciclo << " " << current.next << " " << current.archivo << endl;
-    //     file2.read((char *)&current, sizeof(current));
-    // }
+    cout << "Auxiliar.dat" << endl;
+    fstream file2("auxiliar.dat", ios::app | ios::in | ios::binary);
+    file2.seekg(0, ios::beg);
+    file2.read((char *)&current, sizeof(current));
+    while (!file2.eof()) {
+        cout << current.id << " " << current.name << " " << current.surname << " " << current.ciclo << " " << current.next << " " << current.archivo << endl;
+        file2.read((char *)&current, sizeof(current));
+    }
 
     // cout << endl;
     // cout << "Busqueda por rango:" << endl;
