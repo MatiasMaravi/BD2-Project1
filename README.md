@@ -25,16 +25,16 @@ Cuando el registro a insertar se encuentra entre dos registros.
   <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/SeqFile_img/SF2.png" height="400"/>
 </p>
 
+Además, cuando se alcance el máximo de registros permitidos en el "archivo auxiliar", este procederá a realizar la reorganización.
+
 #### Eliminación:
-Este algoritmo se encarga de dos cosas. En primer lugar, debemos hallar el valor a eliminar. Con esto, podemos actualizar los punteros asociados a este y finalmente actualizando el puntero del registro removido con el valor de "-1a" (un puntero que nunca se utiliza). En segundo lugar, luego de cambiar los punteros, reorganiza los archivos. Es decir, ordena todos los registros dependiendo de su llave implicando que se traspasen todos los datos del "archivo auxiliar" al "archivo principal". Además, es capaz de eliminar todo registro del "archivo auxiliar" luego de reorganizar los registros.
+Este algoritmo se encarga de dos cosas. En primer lugar, hallará el valor a eliminar para obtener su predecesor y sucesor. En segundo lugar, será capaz de actualizar el puntero del registro a eliminar con el valor "-1a" ya que este puntero nunca se utiliza.
 <p align="center">
   <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/SeqFile_img/SF3.png" height="400"/>
-  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/SeqFile_img/SF4.png" height="400"/>
 </p>
 
 #### Búsqueda:
-Para la búsqueda tenemos dos casos: búsqueda simple y búsqueda por rango. El primero simplemente realizará una búsqueda binaria en el "archivo principal". Si no se encuentra en el "archivo principal", entonces se recorrerá todo el "archivo auxiliar" hasta que se encuentre. Si se encuentra el registro a buscar, se retornará un puntero de este; sino, retornará un puntero vacío. *Explicar búsqueda por rango*
-
+Para la búsqueda tenemos dos casos: búsqueda simple y búsqueda por rango. El primero, simplemente, realizará una búsqueda binaria en el "archivo principal". Si no se encuentra en el "archivo principal", entonces se recorrerá todo el "archivo auxiliar" hasta que se encuentre. Si se encuentra el registro a buscar, se retornará un puntero de este; sino, retornará un puntero vacío. El segundo, comparará con respecto a los valores condicionales, es decir, aquellos registros que están dentro del rango de los valores ingresados. Por lo cual, comienza desde el primer registro y va agregando aquellos registros que cumplan con esta condición. Hasta encontrar un registro que no cumpla con esta condición, se seguirá recorriendo los archivos.
 
 ### AVL File:
 ### Extendible Hashing:
