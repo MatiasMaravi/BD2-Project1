@@ -59,7 +59,7 @@ El AVL es una estructura de datos que se caracteriza por ser un árbol BST autoe
   <img src="https://estructurasite.files.wordpress.com/2016/04/arboles1.jpg" height="400"/>
 </p>
 
-### Inserción:
+#### Inserción:
 
 La inserción de un registro comienza con el caso base donde el árbol tendrá su primer registro en la posición 1 del archivo y será el nodo padre del árbol. Después del primer nodo (registro), se realizarán inserciones a la izquierda del árbol si el siguiente registro tiene una llave primaria menor al registro del nodo padre, de la misma forma se realizarán inserciones a la derecha del árbol si el siguiente registro tiene una llave primaria mayor al registro del nodo padre. Cada vez que la diferencia entre las alturas del subárbol izquierdo y el subárbol derecho de cualquier nodo sea más de uno, se realizarán rotaciones en el archivo cambiando la dirección de la posición del nodo padre y los hijos dependiendo de si la rotación es a la derecha o izquierda.
 <p align="center">
@@ -72,7 +72,7 @@ De ser necesario en algunos casos se harán rotaciones dobles a la izquierda y d
   <img src="https://www.ibiblio.org/pub/Linux/docs/LuCaS/Tutoriales/doc-programacion-arboles-avl/htmls/tree11.png" height="400"/>
 </p>
 
-### Eliminacion:
+#### Eliminacion:
 
 <p align="center">
   <img src="https://i.ibb.co/SxK675f/avl1.png" height="400"/>
@@ -111,13 +111,13 @@ La eliminación cuando el nodo padre tiene dos hijos se busca al nodo izquierdo 
 </p>
 
 Después de cada eliminación se realiza un balance y un update height al AVL del archivo.
-### Busqueda:
+#### Búsqueda:
 
-La busqueda se realiza de la siguiente manera tras un metodo recursivo buscamos al registro que tenga el mismo value a buscar en el archivo recorriendo el arbol hacia al lado izquierdo del sub arbol o hacia al lado derecho del sub arbol, con la condicion de que el value sea mayor o menor.
+La búsqueda se realiza de la siguiente manera tras un método recursivo buscamos al registro que tenga el mismo value a buscar en el archivo recorriendo el árbol hacia al lado izquierdo del sub arbol o hacia al lado derecho del sub arbol, con la condición de que el value sea mayor o menor.
 
-### Busqueda por rango:
+#### Búsqueda por rango:
 
-La búsqueda por rango es la misma que la búsqueda de un registro con la diferencia de que al momento de encontrar un registro, dentro del rango establecido, se almacena en un vector de registros recorriendo el árbol hacia al lado izquierdo del subárbol o hacia al lado derecho del subárbol, con la condición de que el value sea mayor o menor.
+La búsqueda por rango es la misma que la búsqueda de un registro con la diferencia de que al momento de encontrar un registro, dentro del rango establecido. Se almacena en un vector de registros recorriendo el árbol hacia al lado izquierdo del subárbol o hacia al lado derecho del subárbol, con la condición de que el value sea mayor o menor.
 
 ### Extendible Hashing:
 El extendible hashing es un método de hash dinámico en el que utilizamos directorios (índices) y depósitos (Buckets) para realizar hash de datos. En términos más simples, el extendible hashing es un método agresivamente flexible en el que la función hash también experimenta cambios dinámicos.
@@ -173,16 +173,16 @@ En el algoritmo de Eliminación utilizaremos el algoritmo de búsqueda ya que bu
 Entendemos que, tanto el AVL File como el Extendible Hashing, son las mejores opciones para insertar valores. Esto se debe a que el Sequential File depende de un caso importante, cuando el archivo auxiliar alcanza su tope. Cuando este sucede, se procede a reordenar, algo que no pasa con las demás técnicas.
 
 ### Búsqueda:
-- Sequential File: O(log n + k)
+- Sequential File: O(log n) + O(k)
 - AVL File: O(log n)
-- Extendible Hashing: O(log n + m)
+- Extendible Hashing: O(log n) + O(m)
 
 En este caso, podemos observar que el AVL File es el más eficiente para las búsquedas ya que no depende de ningún factor adicional, como lo son los tamaños de los archivos auxiliares y el contenido del bucket.
 
 ### Eliminación:
-- Sequential File: O(log n + k)
+- Sequential File: O(log n) + O(k)
 - AVL File: O(log n)
-- Extendible Hashing: O(log n + m)
+- Extendible Hashing: O(log n) + O(m)
 
 Al igual que el caso anterior, como se buscan en primera instancia los valores a eliminar, entonces utiliza la misma lógica. Por lo tanto, el AVL File sigue obteniendo la ventaja.
 
