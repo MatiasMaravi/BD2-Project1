@@ -182,7 +182,7 @@ T AVLFile<T,TK>::find(long pos_node, TK key, fstream &file){
 
     file.seekg(pos_node, ios::beg);
     T record;
-    file.read((char*) &record, sizeof(Record));
+    file.read((char*) &record, sizeof(T));
 
     if(equal_key(record,key))return record; //if(record.cod == key) return record;
     else if(greater_key(record,key)) return find(record.left, key, file); //else if(record.cod > key) return find(record.left, key, file);

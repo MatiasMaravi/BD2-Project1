@@ -6,38 +6,38 @@
 
 using namespace std;
 
-// struct Record {
-//     int id;
-//     char name[20];
-//     char surname[20];
-//     int ciclo;
-//     int next;
-//     char archivo;
+struct Record_sequential {
+    int id;
+    char name[20];
+    char surname[20];
+    int ciclo;
+    int next;
+    char archivo;
 
-//     void setData() {
-//         cout << "ID: "; cin >> id;
-//         cout << "Name: "; cin >> name;
-//         cout << "Surname: "; cin >> surname;
-//         cout << "Ciclo: "; cin >> ciclo;
-//         next = -1;
-//         archivo = 'd';
-//     }
-//     void setData(int id_, string name_, string surname_, int ciclo_) {
-//         this->id = id_;
-//         strcpy(this->name, name_.c_str());
-//         strcpy(this->surname, surname_.c_str());
-//         this->ciclo = ciclo_;
-//         next = -1;
-//         archivo = 'd';
-//     }
-//     void showData() {
-//         cout << "ID: " << id << "\n";
-//         cout << "Name: " << name << "\n";
-//         cout << "Surname: " << surname << "\n";
-//         cout << "Ciclo: " << ciclo << "\n";
-//         cout << "Next: " << next << archivo << "\n\n";
-//     }
-// };
+    void setData() {
+        cout << "ID: "; cin >> id;
+        cout << "Name: "; cin >> name;
+        cout << "Surname: "; cin >> surname;
+        cout << "Ciclo: "; cin >> ciclo;
+        next = -1;
+        archivo = 'd';
+    }
+    void setData(int id_, string name_, string surname_, int ciclo_) {
+        this->id = id_;
+        strcpy(this->name, name_.c_str());
+        strcpy(this->surname, surname_.c_str());
+        this->ciclo = ciclo_;
+        next = -1;
+        archivo = 'd';
+    }
+    void showData() {
+        cout << "ID: " << id << "\n";
+        cout << "Name: " << name << "\n";
+        cout << "Surname: " << surname << "\n";
+        cout << "Ciclo: " << ciclo << "\n";
+        cout << "Next: " << next << archivo << "\n\n";
+    }
+};
 
 template <class T, typename TK>
 class SequentialFile {
@@ -49,26 +49,17 @@ class SequentialFile {
     std::function<bool(const T &, const TK &)> equal_key;
     std::function<bool(const T &, const TK &)> less_key;
     std::function<bool(const T &, const TK &)> greater_key;
+
 public:
-    SequentialFile(string filename1, string filename2);
-
+    static SequentialFile<T, TK>* instance;
+    //singleton
     SequentialFile(string filename1, string filename2,
-                    function<bool(const T &, const T &)> less,
-                    function<bool(const T &, const T &)> greater,
-                    function<bool(const T &, const T & )> equal,
-                    function<bool(const T &, const TK &)> equal_key,
-                    function<bool(const T &, const TK &)> less_key,
-                    function<bool(const T &, const TK &)> greater_key);
-
-    void asignar_lamda_functions(
-        function<bool(const T &, const T &)> less,
-        function<bool(const T &, const T &)> greater,
-        function<bool(const T &, const T & )> equal,
-        function<bool(const T &, const TK &)> equal_key,
-        function<bool(const T &, const TK &)> less_key,
-        function<bool(const T &, const TK &)> greater_key
-    );
-
+                function<bool(const T &, const T &)> less,
+                function<bool(const T &, const T &)> greater,
+                function<bool(const T &, const T & )> equal,
+                function<bool(const T &, const TK &)> equal_key,
+                function<bool(const T &, const TK &)> less_key,
+                function<bool(const T &, const TK &)> greater_key);
     T readRecord(int pos, char fileChar);
 
     int size_datos();
@@ -81,17 +72,9 @@ public:
     T* search(TK key);
     vector<T> range_search(TK key1, TK key2);
 };
-template <class T, typename TK>
-SequentialFile<T, TK>::SequentialFile(string filename1, string filename2){
-    this->datos = filename1;
-    this->auxiliar = filename2;
-    this->less = []( T const&a, T const&b) { return a.id < b.id ;};
-    this->greater = []( T const&a,  T const&b) { return a.id > b.id ;};
-    this->equal = []( T const&a,  T const&b) { return a.id == b.id ;};
-    this->equal_key = []( T const&a,  TK const&b) { return a.id == b ;};
-    this->less_key = []( T const&a,  TK const&b) { return a.id < b ;};
-    this->greater_key = []( T const&a,  TK const&b) { return a.id > b ;};
-}
+template<class T, typename TK>
+SequentialFile<T, TK>* SequentialFile<T, TK>::instance = nullptr;
+
 
 template <class T, typename TK>
 SequentialFile<T, TK>::SequentialFile(string filename1, string filename2,
@@ -109,22 +92,7 @@ SequentialFile<T, TK>::SequentialFile(string filename1, string filename2,
     this->equal_key = equal_key;
     this->less_key = less_key;
     this->greater_key = greater_key;
-}
-template <class T, typename TK>
-void SequentialFile<T,TK>::asignar_lamda_functions(
-        function<bool(const T &, const T &)> less,
-        function<bool(const T &, const T &)> greater,
-        function<bool(const T &, const T & )> equal,
-        function<bool(const T &, const TK &)> equal_key,
-        function<bool(const T &, const TK &)> less_key,
-        function<bool(const T &, const TK &)> greater_key
-    ){
-    this->less = less;
-    this->greater = greater;
-    this->equal = equal;
-    this->equal_key = equal_key;
-    this->less_key = less_key;
-    this->greater_key = greater_key;
+    this->instance = this;
 }
 
 template <class T, typename TK>
