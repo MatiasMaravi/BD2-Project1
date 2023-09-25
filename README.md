@@ -37,19 +37,19 @@ Este algoritmo se encarga de dos cosas. En primer lugar, hallará el valor a eli
 Para la búsqueda tenemos dos casos: búsqueda simple y búsqueda por rango. El primero, simplemente, realizará una búsqueda binaria en el "archivo principal". Si no se encuentra en el "archivo principal", entonces se recorrerá todo el "archivo auxiliar" hasta que se encuentre. Si se encuentra el registro a buscar, se retornará un puntero de este; sino, retornará un puntero vacío. El segundo, comparará con respecto a los valores condicionales, es decir, aquellos registros que están dentro del rango de los valores ingresados. Por lo cual, comienza desde el primer registro y va agregando aquellos registros que cumplan con esta condición. Hasta encontrar un registro que no cumpla con esta condición, se seguirá recorriendo los archivos.
 
 ### AVL File:
-El avl es una estructura de datos que se caracteriza por ser un arbol BST autoequilibrado donde la diferencia entre las alturas de los subárboles izquierdo y derecho para cualquier nodo no puede ser más de uno. De esta estructura lo usamos con archivos y registros para una busqueda mas eficiente donde cada nodo es un registro y el archivo tiene dos punteros para la organizacion a la derecha y a la izquierda.
+El AVL es una estructura de datos que se caracteriza por ser un árbol BST autoequilibrado donde la diferencia entre las alturas de los subárboles izquierdo y derecho para cualquier nodo no puede ser más de uno. Esta estructura lo usamos con archivos y registros para una búsqueda más eficiente donde cada nodo es un registro y el archivo tiene dos punteros para la organizacion a la derecha y a la izquierda.
 <p align="center">
   <img src="https://estructurasite.files.wordpress.com/2016/04/arboles1.jpg" height="400"/>
 </p>
 
-### Inserccion:
+### Inserción:
 
-La inserccion de un registro comienza con el caso base donde el arbol tendra su primer registro en la posicion 1 del archivo y sera el nodo padre del arbol. Despues del primer nodo(Registro). Se realizaran insercciones a la izquierda del arbol si el siguiente registro tiene un primary key menor al registro del nodo padre, de la misma forma se relizara inserciones a la derecha del arbol si el siguiente registro tiene un primary key mayor al registro del nodo padre. Cada vez que la diferencia entre las alturas del subárbol izquierdo y el subárbol derecho de cualquier nodo sea mas de uno se realizaran rotaciones en el archivo cambiando la direccion de la poscion del nodo padre y los hijos dependiendo de si la rotacion es a la derecha o izquierda.
+La inserción de un registro comienza con el caso base donde el árbol tendrá su primer registro en la posición 1 del archivo y será el nodo padre del árbol. Después del primer nodo (registro), se realizarán inserciones a la izquierda del árbol si el siguiente registro tiene una llave primaria menor al registro del nodo padre, de la misma forma se realizarán inserciones a la derecha del árbol si el siguiente registro tiene una llave primaria mayor al registro del nodo padre. Cada vez que la diferencia entre las alturas del subárbol izquierdo y el subárbol derecho de cualquier nodo sea más de uno, se realizarán rotaciones en el archivo cambiando la dirección de la posición del nodo padre y los hijos dependiendo de si la rotación es a la derecha o izquierda.
 <p align="center">
-  <img src="https://www.ibiblio.org/pub/Linux/docs/LuCaS/Tutoriales/doc-programacion-arboles-avl/htmls/tree10.png" height="400"/>
+  <img src="https://www.ibiblio.org/pub/Linux/docs/LuCaS/Tutoriales/doc-programacion-arboles-avl/htmls/tree10.png" height="250"/>
 </p>
 
-De ser necesario en algunos casos se haran rotaciones dobles a la izquierda y derecha o derecha y izquierda.
+De ser necesario en algunos casos se harán rotaciones dobles a la izquierda y derecha o derecha e izquierda.
 
 <p align="center">
   <img src="https://www.ibiblio.org/pub/Linux/docs/LuCaS/Tutoriales/doc-programacion-arboles-avl/htmls/tree11.png" height="400"/>
@@ -61,49 +61,49 @@ De ser necesario en algunos casos se haran rotaciones dobles a la izquierda y de
   <img src="https://i.ibb.co/SxK675f/avl1.png" height="400"/>
 </p>
 
-Numero 1:
-La eliminacion se realiza con la busqueda del registro a eliminar y presenta los casos correspondientes, si el nodo padre no tiene hijos (registros), se elimina directamente el registro.
+Caso 1:
+La eliminación se realiza con la búsqueda del registro a eliminar y presenta los casos correspondientes, si el nodo padre no tiene hijos (registros), se elimina directamente el registro.
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MatiasMaravi/BD2-Project1/main/Imagenes/AVLFile_img/AVLF1.png" height="400"/>
+  <img src="https://raw.githubusercontent.com/MatiasMaravi/BD2-Project1/main/Imagenes/AVLFile_img/AVLF1.png" height="250"/>
 </p>
 
 <p align="center">
-  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/AVLFile_img/AVLF2_1.png?raw=true" height="400"/>
+  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/AVLFile_img/AVLF2_1.png?raw=true" height="250"/>
 </p>
 
-Numero 2:
-La eliminacion cuando el nodo padre solo tiene un hijo a la izquierda o a la derecha se cambia directamente el nodo con el padre y ahora el nodo padre es una hoja, que se puede eliminar, en el caso de registro se escribe el registro del nodo padre con el hijo.
+Caso 2:
+La eliminación cuando el nodo padre solo tiene un hijo a la izquierda o a la derecha se cambia directamente el nodo con el padre y ahora el nodo padre es una hoja, que se puede eliminar, en el caso de registro se escribe el registro del nodo padre con el hijo.
 
 <p align="center">
-  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/AVLFile_img/AVLF3.png?raw=true" height="400"/>
-</p>
-
-<p align="center">
-  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/AVLFile_img/AVLF4.png?raw=true" height="400"/>
-</p>
-
-Numero 3: 
-La eliminacion cuando el nodo padre tiene dos hijos se busca al nodo izquierdo mayor del sub arbol de registros para intercambiar por el padre, en este casos e sobre escribe el padre con el hijo para luego realizar el remove del nodo repetido del sub-arbol, en este caso eliminar el registro una vez sobre escrito.
-
-<p align="center">
-  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/AVLFile_img/AVLF6.png?raw=true" height="400"/>
+  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/AVLFile_img/AVLF3.png?raw=true" height="250"/>
 </p>
 
 <p align="center">
-  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/AVLFile_img/AVLF7.png?raw=true" height="400"/>
+  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/AVLFile_img/AVLF4.png?raw=true" height="250"/>
 </p>
 
-Despues de cada eliminacion se realiza un balance y un update height al avl del archivo.
+Caso 3: 
+La eliminación cuando el nodo padre tiene dos hijos se busca al nodo izquierdo mayor del sub arbol de registros para intercambiar por el padre, en este casos e sobre escribe el padre con el hijo para luego realizar el remove del nodo repetido del sub-arbol, en este caso eliminar el registro una vez sobre escrito.
+
+<p align="center">
+  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/AVLFile_img/AVLF6.png?raw=true" height="250"/>
+</p>
+
+<p align="center">
+  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/AVLFile_img/AVLF7.png?raw=true" height="250"/>
+</p>
+
+Después de cada eliminación se realiza un balance y un update height al AVL del archivo.
 ### Busqueda:
 
 La busqueda se realiza de la siguiente manera tras un metodo recursivo buscamos al registro que tenga el mismo value a buscar en el archivo recorriendo el arbol hacia al lado izquierdo del sub arbol o hacia al lado derecho del sub arbol, con la condicion de que el value sea mayor o menor.
 
 ### Busqueda por rango:
 
-La busqueda por rango es la misma que la busqueda de un registro con la diferencia de que al momento de encontrar un registro dentro del rango establecido se almacena en un vector de registros recorriendo el arbol hacia al lado izquierdo del sub arbol o hacia al lado derecho del sub arbol, con la condicion de que el value sea mayor o menor.
+La búsqueda por rango es la misma que la búsqueda de un registro con la diferencia de que al momento de encontrar un registro, dentro del rango establecido, se almacena en un vector de registros recorriendo el árbol hacia al lado izquierdo del subárbol o hacia al lado derecho del subárbol, con la condición de que el value sea mayor o menor.
 
 ### Extendible Hashing:
-El extendible hashing es un método de hash dinámico en el que utilizamos directorios (índices) y depositos (Buckets) para realizar hash de datos. En términos más simples el extendible hashing es un método agresivamente flexible en el que la función hash también experimenta cambios dinámicos.
+El extendible hashing es un método de hash dinámico en el que utilizamos directorios (índices) y depósitos (Buckets) para realizar hash de datos. En términos más simples, el extendible hashing es un método agresivamente flexible en el que la función hash también experimenta cambios dinámicos.
 
 #### Inserción:
 La inserción en el extendible hashing cuenta con una serie de pasos:
@@ -115,13 +115,13 @@ La inserción en el extendible hashing cuenta con una serie de pasos:
   <img width="400" alt="image" src="https://github.com/MatiasMaravi/BD2-Project1/assets/90939274/09dad397-9a82-4bf1-8f71-b44d94555508">
 </p>
   
-4. Verificaremos el desbordamiento del bucket, es decir, si el bucket se encuentra lleno. De ser así, tendremos que crear otro bucket y aumentarle su profundidad. Si ya se llego a la profundidad global, es decir, el número máximo de buckets, se procederá a crear un nuevo bucket y enlazarlo al último bucket creado.
+4. Verificaremos el desbordamiento del bucket, es decir, si el bucket se encuentra lleno. De ser así, tendremos que crear otro bucket y aumentarle su profundidad. Si ya se llegó a la profundidad global, es decir, el número máximo de buckets, se procederá a crear un nuevo bucket y enlazarlo al último bucket creado.
 
 <p align="center">
   <img width="549" alt="image" src="https://github.com/MatiasMaravi/BD2-Project1/assets/90939274/30c02482-18cd-4168-9106-cdf70028281a">
 </p>
 
-Es importante aclarar que los registros se dividiran a la mitad para el nuevo y el antiguo bucket.
+Es importante aclarar que los registros se dividirán a la mitad para el nuevo y el antiguo bucket.
 
 <p align="center">
   <img width="404" alt="image" src="https://github.com/MatiasMaravi/BD2-Project1/assets/90939274/b8872adf-aaf5-4fed-ab34-52142fd35755">
@@ -129,7 +129,7 @@ Es importante aclarar que los registros se dividiran a la mitad para el nuevo y 
 
 #### Búsqueda:
 
-En el algoritmo de búsqueda, primero hashearemos la llave a través de la cual vamos a buscar. Luego, recorremos el arbol digital, dependiendo el valor que obtendremos en el binario. Si es "0" avanzaremos por la rama izquierda, sino iremos por la derecha. En caso no se encuentre la llave, devolverá un valor sin nada.
+En el algoritmo de búsqueda, primero hashearemos la llave a través de la cual vamos a buscar. Luego, recorremos el árbol digital, dependiendo el valor que obtendremos en el binario. Si es "0" avanzaremos por la rama izquierda, sino iremos por la derecha. En caso no se encuentre la llave, devolverá un valor sin nada.
 
 #### Eliminación:
 
