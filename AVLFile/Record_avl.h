@@ -18,8 +18,6 @@ struct Record_avl {
     int age;
     char club_name[50];
     char nationality_name[50];
-    int next;
-    char archivo;
     long left = -1, right = -1;
     int height = 0;
 
@@ -31,8 +29,7 @@ struct Record_avl {
         this->age = age_;
         strcpy(this->club_name, club_name_);
         strcpy(this->nationality_name, nationality_name_);
-        next = -1;
-        archivo = 'd';
+
     }
 
 
@@ -43,7 +40,7 @@ struct Record_avl {
         cout << "Age: " << age << "\n";
         cout << "Club Name: " << club_name << "\n";
         cout << "Nationality Name: " << nationality_name << "\n";
-        cout << "Next: " << next << archivo << "\n\n";
+
     }
 };
 #endif //BD2_PROJECT1_RECORD_AVL_H

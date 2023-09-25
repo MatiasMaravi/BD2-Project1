@@ -3,7 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <functional>
-#include "../Record_sequential.h"
+#include "../SequentialFile/Record_sequential.h"
 
 using namespace std;
 
@@ -27,7 +27,7 @@ public:
                    function<bool(const T &, const TK &)> less_key,
                    function<bool(const T &, const TK &)> greater_key);
 
-    Record readRecord(int pos, char fileChar);
+    T readRecord(int pos, char fileChar);
     static SequentialFile<T, TK>& getInstance(string filename1, string filename2,
                                               function<bool(const T &, const T &)> less,
                                               function<bool(const T &, const T &)> greater,
@@ -41,14 +41,15 @@ public:
 
     int size_datos();
     int size_auxiliar();
-    vector<Record> reorganizar();
+    vector<T> reorganizar();
 
 
-    bool insert(Record record);
+    bool insert(T record);
     bool remove(TK key);
-    vector<Record> search(TK key);
-   // Record* search(TK key);
-    vector<Record> range_search(TK key1, TK key2);
+    vector<T> search(TK key);
+
+    vector<T> range_search(TK key1, TK key2);
+
     ~SequentialFile() {
         delete instance;
     }
@@ -77,8 +78,8 @@ SequentialFile<T, TK>::SequentialFile(string filename1, string filename2,
 }
 
 template <class T, typename TK>
-Record SequentialFile<T, TK>::readRecord(int pos, char fileChar) {
-    Record result;
+T SequentialFile<T, TK>::readRecord(int pos, char fileChar) {
+    T result;
     if (fileChar == 'a') {
         fstream file(this->auxiliar, ios::in | ios::binary);
         if (!file.is_open()) throw("No se pudo abrir el archivo");
@@ -87,8 +88,8 @@ Record SequentialFile<T, TK>::readRecord(int pos, char fileChar) {
             return result;
         }
 
-        file.seekg(sizeof(Record)*pos, ios::beg);
-        file.read((char*) &result, sizeof(Record));
+        file.seekg(sizeof(T)*pos, ios::beg);
+        file.read((char*) &result, sizeof(T));
 
         file.close();
     }
@@ -100,8 +101,8 @@ Record SequentialFile<T, TK>::readRecord(int pos, char fileChar) {
             return result;
         }
 
-        file.seekg(sizeof(Record)*(pos), ios::beg);
-        file.read((char*) &result, sizeof(Record));
+        file.seekg(sizeof(T)*(pos), ios::beg);
+        file.read((char*) &result, sizeof(T));
 
         file.close();
     }
@@ -119,7 +120,7 @@ int SequentialFile<T, TK>::size_datos() {
     int size = file.tellg();
     file.close();
 
-    return size / sizeof(Record);
+    return size / sizeof(T);
 }
 
 template <class T, typename TK>
@@ -131,20 +132,20 @@ int SequentialFile<T, TK>::size_auxiliar() {
     int size = file.tellg();
     file.close();
 
-    return size / sizeof(Record);
+    return size / sizeof(T);
 }
 
 
 template <class T, typename TK>
-vector<Record> SequentialFile<T, TK>::reorganizar() {
+vector<T> SequentialFile<T, TK>::reorganizar() {
     fstream file(this->datos, ios::in | ios::binary);
     fstream auxFile(this->auxiliar, ios::in | ios::binary);
 
     if (!file.is_open() || !auxFile.is_open()) throw("No se pudo abrir el archivo");
 
-    vector<Record> records;
-    Record record;
-    file.read((char*) &record, sizeof(Record));
+    vector<T> records;
+    T record;
+    file.read((char*) &record, sizeof(T));
 
     char fileChar = record.archivo;
     int pos = record.next, auxPos = 1;
@@ -154,12 +155,12 @@ vector<Record> SequentialFile<T, TK>::reorganizar() {
 
     while (fileChar != 'd' or pos != -1) {
         if (fileChar == 'a') {
-            auxFile.seekg(sizeof(Record)*pos, ios::beg);
-            auxFile.read((char*) &record, sizeof(Record));
+            auxFile.seekg(sizeof(T)*pos, ios::beg);
+            auxFile.read((char*) &record, sizeof(T));
         }
         else if (fileChar == 'd') {
-            file.seekg(sizeof(Record)*(pos), ios::beg);
-            file.read((char*) &record, sizeof(Record));
+            file.seekg(sizeof(T)*(pos), ios::beg);
+            file.read((char*) &record, sizeof(T));
         }
         fileChar = record.archivo;
         pos = record.next;
@@ -183,7 +184,7 @@ vector<Record> SequentialFile<T, TK>::reorganizar() {
     for (auto r : records) {
         r.archivo = 'd';
         r.showData();
-        file2.write((char*) &r, sizeof(Record));
+        file2.write((char*) &r, sizeof(T));
     }
 
     file2.close();
@@ -196,14 +197,14 @@ vector<Record> SequentialFile<T, TK>::reorganizar() {
 
 
 template <class T, typename TK>
-bool SequentialFile<T, TK>::insert(Record record) {
+bool SequentialFile<T, TK>::insert(T record) {
     fstream file(this->datos, ios::app | ios::binary | ios::in | ios::out);
 
     if (!file.is_open()) throw("No se pudo abrir el archivo");
 
     if (size_datos() == 0) {
         // Se guarda un puntero al inicio de todos los datos
-        Record cabecera;
+        T cabecera;
         //cabecera.setData(2, "nombre", "apellido", 1);
         cabecera.setData(2, "nombre", 100, 20,"alianza","peru");
         cabecera.next = 1;
@@ -219,7 +220,7 @@ bool SequentialFile<T, TK>::insert(Record record) {
         fstream file(this->datos, ios::binary | ios::in | ios::out);
         int size = sizeof(record);
         file.seekg(-size, ios::end);
-        Record last;
+        T last;
         file.read((char *)&last, sizeof(last));
 
         if (greater(record, last)) {
@@ -237,8 +238,8 @@ bool SequentialFile<T, TK>::insert(Record record) {
             if (!aux.is_open())
                 throw("No se pudo abrir el archivo");
 
-            Record current;
-            file.seekg(sizeof(Record), ios::beg);
+            T current;
+            file.seekg(sizeof(T), ios::beg);
             file.read((char *)&current, sizeof(current));
             int pos = 0;
 
@@ -255,13 +256,13 @@ bool SequentialFile<T, TK>::insert(Record record) {
             // Verificado
             if (current.archivo == 'a') {
                 fstream aux(this->auxiliar, ios::binary | ios::in | ios::out);
-                Record auxiliar;
-                aux.seekg(siguiente * sizeof(Record), ios::beg);
+                T auxiliar;
+                aux.seekg(siguiente * sizeof(T), ios::beg);
                 aux.read((char *)&auxiliar, sizeof(auxiliar));
                 int anterior = siguiente;
 
                 while (greater(record,auxiliar) && auxiliar.archivo == 'a' && auxiliar.next != -1) {
-                    aux.seekg(siguiente * sizeof(Record), ios::beg);
+                    aux.seekg(siguiente * sizeof(T), ios::beg);
                     aux.read((char *)&auxiliar, sizeof(auxiliar));
                     anterior = siguiente;
                     siguiente = auxiliar.next;
@@ -273,7 +274,7 @@ bool SequentialFile<T, TK>::insert(Record record) {
                 auxiliar.next = size_auxiliar();
                 auxiliar.archivo = 'a';
 
-                aux.seekp(anterior * sizeof(Record), ios::beg);
+                aux.seekp(anterior * sizeof(T), ios::beg);
                 aux.write((char *)&auxiliar, sizeof(auxiliar));
                 aux.seekp(0, ios::end);
                 aux.write((char *)&record, sizeof(record));
@@ -314,15 +315,15 @@ bool SequentialFile<T, TK>::remove(TK key) {
     fstream file (this->datos, ios::in | ios::out | ios::binary);
     if (!file.is_open()) return false;
 
-    Record cabecera;
-    file.read((char*) &cabecera, sizeof(Record));
+    T cabecera;
+    file.read((char*) &cabecera, sizeof(T));
 
-    Record record = readRecord(cabecera.next, cabecera.archivo), auxRecord;
+    T record = readRecord(cabecera.next, cabecera.archivo), auxRecord;
     if (equal_key(record, key)) {
         cabecera.next = record.next;
         cabecera.archivo = record.archivo;
         file.seekp(0, ios::beg);
-        file.write((char*) &cabecera, sizeof(Record));
+        file.write((char*) &cabecera, sizeof(T));
         file.close();
 
         reorganizar();
@@ -344,25 +345,25 @@ bool SequentialFile<T, TK>::remove(TK key) {
                 auxRecord.archivo = 'a';
 
                 if (record.archivo == 'd') {
-                    file.seekp(sizeof(Record) * record.next, ios::beg);
-                    file.write((char*) &auxRecord, sizeof(Record));
+                    file.seekp(sizeof(T) * record.next, ios::beg);
+                    file.write((char*) &auxRecord, sizeof(T));
                 }
                 else {
-                    auxFile.seekp(sizeof(Record) * (record.next - 1), ios::beg);
-                    auxFile.write((char*) &auxRecord, sizeof(Record));
+                    auxFile.seekp(sizeof(T) * (record.next - 1), ios::beg);
+                    auxFile.write((char*) &auxRecord, sizeof(T));
                 }
 
                 record.next = auxPos;
                 record.archivo = auxChar;
 
                 if (fileChar == 'd') {
-                    file.seekp(sizeof(Record) * pos, ios::beg);
-                    file.write((char*) &record, sizeof(Record));
+                    file.seekp(sizeof(T) * pos, ios::beg);
+                    file.write((char*) &record, sizeof(T));
 
                 }
                 else {
-                    auxFile.seekp(sizeof(Record) * (pos - 1), ios::beg);
-                    auxFile.write((char*) &record, sizeof(Record));
+                    auxFile.seekp(sizeof(T) * (pos - 1), ios::beg);
+                    auxFile.write((char*) &record, sizeof(T));
                 }
 
                 file.close();
@@ -380,16 +381,16 @@ bool SequentialFile<T, TK>::remove(TK key) {
 }
 
 template <class T, typename TK>
-vector<Record> SequentialFile<T, TK>::search(TK key) {
+vector<T> SequentialFile<T, TK>::search(TK key) {
     fstream file(this->datos, ios::in | ios::binary);
-    vector<Record> results;
-    Record result;
+    vector<T> results;
+    T result;
     int l = 1, u = size_datos() - 1, m;
 
     while (u >= l) {
         m = (l + u) / 2;
-        file.seekg(sizeof(Record) * m, ios::beg);
-        file.read((char*)&result, sizeof(Record));
+        file.seekg(sizeof(T) * m, ios::beg);
+        file.read((char*)&result, sizeof(T));
         if (greater_key(result, key)) {
             u = m - 1;
         } else if (less_key(result, key)) {
@@ -399,8 +400,8 @@ vector<Record> SequentialFile<T, TK>::search(TK key) {
             results.push_back(result);
 
             for (int i = m - 1; i >= l; i--) {
-                file.seekg(sizeof(Record) * i, ios::beg);
-                file.read((char*)&result, sizeof(Record));
+                file.seekg(sizeof(T) * i, ios::beg);
+                file.read((char*)&result, sizeof(T));
                 if (equal_key(result, key)) {
                     results.push_back(result);
                 } else {
@@ -409,8 +410,8 @@ vector<Record> SequentialFile<T, TK>::search(TK key) {
             }
 
             for (int i = m + 1; i <= u; i++) {
-                file.seekg(sizeof(Record) * i, ios::beg);
-                file.read((char*)&result, sizeof(Record));
+                file.seekg(sizeof(T) * i, ios::beg);
+                file.read((char*)&result, sizeof(T));
                 if (equal_key(result, key)) {
                     results.push_back(result);
                 } else {
@@ -426,7 +427,7 @@ vector<Record> SequentialFile<T, TK>::search(TK key) {
     if (results.empty()) {
         fstream auxFile(this->auxiliar, ios::in | ios::binary);
         if (!auxFile.is_open()) throw("No se pudo abrir el archivo auxiliar");
-        while (auxFile.read((char*)&result, sizeof(Record))) {
+        while (auxFile.read((char*)&result, sizeof(T))) {
             if (equal_key(result, key)) {
                 results.push_back(result);
             }
@@ -441,14 +442,14 @@ vector<Record> SequentialFile<T, TK>::search(TK key) {
 
 
 template <class T, typename TK>
-vector<Record> SequentialFile<T, TK>::range_search(TK key1, TK key2) {
-    vector<Record> result;
+vector<T> SequentialFile<T, TK>::range_search(TK key1, TK key2) {
+    vector<T> result;
     fstream file(this->datos, ios::app | ios::in | ios::binary | ios::out);
     fstream aux(this->auxiliar, ios::app | ios::in | ios::binary | ios::out);
 
     if (!file.is_open() || !aux.is_open()) return result;
 
-    Record cabecera;
+    T cabecera;
 
     file.seekg(0, ios::beg);
     file.read((char *)&cabecera, sizeof(cabecera));
@@ -457,19 +458,19 @@ vector<Record> SequentialFile<T, TK>::range_search(TK key1, TK key2) {
     char archivo = cabecera.archivo;
 
     if (archivo == 'd') {
-        Record current;
-        file.seekg(pos * sizeof(Record), ios::beg);
+        T current;
+        file.seekg(pos * sizeof(T), ios::beg);
         file.read((char *)&current, sizeof(current));
         while (less_key(current,key2) || equal_key(current,key2)) //a <= key2
         {
             if (greater_key(current,key1) || equal_key(current,key1)) result.push_back(current); //a >= key1
             if (current.next == -1) break;
             if (current.archivo == 'a') {
-                aux.seekg(current.next * sizeof(Record), ios::beg);
+                aux.seekg(current.next * sizeof(T), ios::beg);
                 aux.read((char *)&current, sizeof(current));
             }
             else {
-                file.seekg(current.next * sizeof(Record), ios::beg);
+                file.seekg(current.next * sizeof(T), ios::beg);
                 file.read((char *)&current, sizeof(current));
             }
         }
@@ -478,19 +479,19 @@ vector<Record> SequentialFile<T, TK>::range_search(TK key1, TK key2) {
         return result;
     }
     else {
-        Record current;
-        aux.seekg(pos * sizeof(Record), ios::beg);
+        T current;
+        aux.seekg(pos * sizeof(T), ios::beg);
         aux.read((char *)&current, sizeof(current));
         while (less_key(current,key2) || equal_key(current,key2)) { //a <= key2
             if (greater_key(current,key1) || equal_key(current,key1)) result.push_back(current); //a >= key1
             if (current.next == -1) break;
 
             if (current.archivo == 'a') {
-                aux.seekg(current.next * sizeof(Record), ios::beg);
+                aux.seekg(current.next * sizeof(T), ios::beg);
                 aux.read((char *)&current, sizeof(current));
             }
             else {
-                file.seekg(current.next * sizeof(Record), ios::beg);
+                file.seekg(current.next * sizeof(T), ios::beg);
                 file.read((char *)&current, sizeof(current));
             }
         }

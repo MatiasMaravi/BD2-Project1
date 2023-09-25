@@ -24,7 +24,7 @@ void insertar_sequential(const char* nombre_archivo){
 
     std::string linea;
 
-    SequentialFile<Record, int> secuential_file("buckets4.dat","indices4.dat",
+    SequentialFile<Record, int> secuential_file("buckets_seq.dat","indices_seq.dat",
                                                 []( Record const&a, Record const&b) { return a.player_id < b.player_id;},
                                                 []( Record const&a,  Record const&b) { return a.player_id > b.player_id;},
                                                 []( Record const&a,  Record const&b) { return a.player_id == b.player_id;},
@@ -76,7 +76,7 @@ void insertar_sequential(const char* nombre_archivo){
 
 vector<Record> ordenar_sequential(){
     SequentialFile<Record, int>& instancia = SequentialFile<Record, int>::getInstance(
-            "buckets4.dat","indices4.dat",
+            "buckets_seq.dat","indices_seq.dat",
             []( Record const&a, Record const&b) { return a.player_id < b.player_id;},
             []( Record const&a,  Record const&b) { return a.player_id > b.player_id;},
             []( Record const&a,  Record const&b) { return a.player_id == b.player_id;},
@@ -92,7 +92,7 @@ vector<Record> ordenar_sequential(){
 
 vector<Record> buscar_sequential(int key){
     SequentialFile<Record, int>& instancia = SequentialFile<Record, int>::getInstance(
-            "buckets4.dat","indices4.dat",
+            "buckets_seq.dat","indices_seq.dat",
             []( Record const&a, Record const&b) { return a.player_id < b.player_id;},
             []( Record const&a,  Record const&b) { return a.player_id > b.player_id;},
             []( Record const&a,  Record const&b) { return a.player_id == b.player_id;},
@@ -108,7 +108,7 @@ vector<Record> buscar_sequential(int key){
 
 vector<Record> buscar_range_sequential(int key1,int key2){
     SequentialFile<Record, int>& instancia = SequentialFile<Record, int>::getInstance(
-            "buckets4.dat","indices4.dat",
+            "buckets_seq.dat","indices_seq.dat",
             []( Record const&a, Record const&b) { return a.player_id < b.player_id;},
             []( Record const&a,  Record const&b) { return a.player_id > b.player_id;},
             []( Record const&a,  Record const&b) { return a.player_id == b.player_id;},

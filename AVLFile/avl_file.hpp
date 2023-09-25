@@ -4,32 +4,9 @@
 #include <climits>
 #include <vector>
 #include <functional>
-#include "../Record_avl.h"
+#include "../AVLFile/Record_avl.h"
 using namespace std;
-//struct Record
-//{
-//    int cod;
-//    char nombre[12];
-//    int ciclo;
-//    long left = -1, right = -1;
-//    int height = 0;
-//    void setData();
-//    void showData();
-//};
-//void Record::setData(){
-//    cout << "Codigo: ";cin >> cod;
-//    cout << "Nombre: ";cin >> nombre;
-//    cout << "Ciclo: ";cin >> ciclo;
-//}
-//
-//void Record::showData(){
-//    cout << "\nCodigo: " << cod;
-//    cout << "\nNombre: " << nombre;
-//    cout << "\nCiclo : " << ciclo;
-//    cout << "\nleft : " << left;
-//    cout << "\nright : " << right <<endl;
-//    cout << "\nheight : " << height <<endl;
-//};
+
 
 template <class T, typename TK>
 class AVLFile{
@@ -55,16 +32,15 @@ public:
     static AVLFile<T, TK>& getInstance(string filename,
                                               function<bool(const T &, const T &)> less,
                                               function<bool(const T &, const T &)> greater,
-                                              function<bool(const T &, const T &)> equal_key,
-
+                                              function<bool(const T &, const TK &)> equal_key,
                                               function<bool(const T &, const TK &)> less_key,
                                               function<bool(const T &, const TK &)> greater_key,
                                               function<TK(const T &)> get_key) {
-        static AVLFile<T, TK> instance(filename, less, greater, equal_key, less_key, greater_key);
+        static AVLFile<T, TK> instance(filename, less, greater, equal_key, less_key, greater_key,get_key);
         return instance;
     }
 
-    T find(TK key);
+    vector<T> find(TK key);
 
     void insert(T record);
 
@@ -106,6 +82,9 @@ private:
 
     vector<T> rangeSearch(fstream &file, TK begin_key, TK end_key ,long &pos_node, vector<T> &result);
 };
+
+template <class T, typename TK>
+AVLFile<T, TK>* AVLFile<T, TK>::instance = nullptr;
 //Constructor
 template<class T, typename TK>
 AVLFile<T, TK>::AVLFile(string filename,
@@ -134,12 +113,14 @@ AVLFile<T, TK>::AVLFile(string filename,
 
 }
 template<class T, typename TK>
-T AVLFile<T,TK>::find(TK key){
+vector<T> AVLFile<T,TK>::find(TK key){
+    vector<T> final;
     fstream file(this->filename, ios::app | ios::binary | ios::in | ios::out);
     if (!file.is_open()) throw std::runtime_error("No se pudo abrir el archivo");
     T record = find(pos_root,key,file);
+    final.push_back(record);
     file.close();
-    return record;
+    return final;
 }
 template<class T, typename TK>
 void AVLFile<T,TK>::insert(T record){
@@ -199,7 +180,7 @@ T AVLFile<T,TK>::find(long pos_node, TK key, fstream &file){
 
     file.seekg(pos_node, ios::beg);
     T record;
-    file.read((char*) &record, sizeof(Record_avl));
+    file.read((char*) &record, sizeof(T));
 
     if(equal_key(record,key))return record; //if(record.cod == key) return record;
     else if(greater_key(record,key)) return find(record.left, key, file); //else if(record.cod > key) return find(record.left, key, file);
@@ -223,9 +204,9 @@ void AVLFile<T,TK>::insert(long pos_node, T record, fstream& file){
         if(RecordCurrent.left == -1){
             file.seekp(0, ios::end);
             RecordCurrent.left = file.tellg();
-            file.write((char*)&record, sizeof(Record_avl));
+            file.write((char*)&record, sizeof(T));
             file.seekg(pos_node, ios::beg);
-            file.write((char*)&RecordCurrent, sizeof(Record_avl));
+            file.write((char*)&RecordCurrent, sizeof(T));
         }
         else
             insert(RecordCurrent.left, record, file);
@@ -233,9 +214,9 @@ void AVLFile<T,TK>::insert(long pos_node, T record, fstream& file){
         if(RecordCurrent.right == -1){
             file.seekp(0, ios::end);
             RecordCurrent.right = file.tellg();
-            file.write((char*)&record, sizeof(Record_avl));
+            file.write((char*)&record, sizeof(T));
             file.seekg(pos_node, ios::beg);
-            file.write((char*)&RecordCurrent, sizeof(Record_avl));
+            file.write((char*)&RecordCurrent, sizeof(T));
         }
         else
             insert(RecordCurrent.right, record, file);
@@ -296,7 +277,7 @@ bool AVLFile<T,TK>::remove(long pos_node, TK key, fstream& file){
             long successorPos = maxleft(record.left, file);
             T succesor;
             file.seekg(successorPos,ios::beg);
-            file.read((char*)&succesor,sizeof(Record_avl));
+            file.read((char*)&succesor,sizeof(T));
             remove(successorPos,get_key(succesor),file);//remove(successorPos,succesor.cod,file);
 
             succesor.right = record.right;
@@ -307,7 +288,7 @@ bool AVLFile<T,TK>::remove(long pos_node, TK key, fstream& file){
                 succesor.left = -1;
             }
             file.seekp(pos_node, ios::beg);
-            file.write((char*)&succesor,sizeof(Record_avl));
+            file.write((char*)&succesor,sizeof(T));
             flag = true;
         }
     }
@@ -481,7 +462,7 @@ void AVLFile<T,TK>::right_rota(long pos_node, fstream& file){
     file.write((char*)&temp, sizeof(T));
 
     file.seekg(pos_temp, ios::beg);
-    file.write((char*)&record, sizeof(Record_avl));
+    file.write((char*)&record, sizeof(T));
 
     updateHeight(pos_node, file);
     updateHeight(pos_temp, file);

@@ -2,8 +2,8 @@
 // Created by JLeandroJM on 24/09/23.
 //
 
-#ifndef BD2_PROJECT1_INTERFAZ_SVL_H
-#define BD2_PROJECT1_INTERFAZ_SVL_H
+#ifndef BD2_PROJECT1_INTERFAZ_AVL_H
+#define BD2_PROJECT1_INTERFAZ_AVL_H
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <fstream>
@@ -21,7 +21,7 @@ void insertar_avl(const char* nombre_archivo){
 
 
     std::string linea;
-    AVLFile<Record_avl,string> avl("data.dat",
+    AVLFile<Record_avl,int> avl("data_avl.dat",
                                 []( Record_avl const&a, Record_avl const&b) { return a.player_id < b.player_id;}, //less
                                 []( Record_avl const&a, Record_avl const&b) { return a.player_id > b.player_id;}, //greater
                                 []( Record_avl const&a, int const&b) { return a.player_id == b;}, //equal_key
@@ -69,6 +69,37 @@ void insertar_avl(const char* nombre_archivo){
 
 
 }
+vector<Record_avl> buscar_avl(int key){
+    AVLFile<Record_avl, int>& instancia = AVLFile<Record_avl, int>::getInstance(
+            "data_avl.dat",
+            []( Record_avl const&a, Record_avl const&b) { return a.player_id < b.player_id;}, //less
+            []( Record_avl const&a, Record_avl const&b) { return a.player_id > b.player_id;}, //greater
+            []( Record_avl const&a, int const&b) { return a.player_id == b;}, //equal_key
+            []( Record_avl const&a, int const&b) { return a.player_id < b;}, //less_key
+            []( Record_avl const&a, int const&b) { return a.player_id > b;}, //greater_key
+            []( Record_avl const&a) { return a.player_id;} //get_key
+
+    );
+
+    return instancia.find(key);
+
+}
+
+vector<Record_avl> buscar_range_avl(int key1,int key2){
+    AVLFile<Record_avl, int>& instancia = AVLFile<Record_avl, int>::getInstance(
+            "data_avl.dat",
+            []( Record_avl const&a, Record_avl const&b) { return a.player_id < b.player_id;}, //less
+            []( Record_avl const&a, Record_avl const&b) { return a.player_id > b.player_id;}, //greater
+            []( Record_avl const&a, int const&b) { return a.player_id == b;}, //equal_key
+            []( Record_avl const&a, int const&b) { return a.player_id < b;}, //less_key
+            []( Record_avl const&a, int const&b) { return a.player_id > b;}, //greater_key
+            []( Record_avl const&a) { return a.player_id;} //get_key
+
+    );
+
+    return instancia.rangeSearch(key1,key2);
+
+}
 
 
-#endif //BD2_PROJECT1_INTERFAZ_SVL_H
+#endif //BD2_PROJECT1_INTERFAZ_AVL_H

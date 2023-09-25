@@ -7,6 +7,8 @@
 #include "textinput.h"
 #include "label.h"
 #include "interfaz_sequential.h"
+#include "interfaz_avl.h"
+#include "interfaz_extendibleHash.h"
 
 using namespace std;
 
@@ -54,7 +56,7 @@ int main(){
     rectangle_arriba.setPosition(0, 0);
     rectangle_arriba.setFillColor(sf::Color(236, 190, 58));
     std::size_t longitud = std::strlen(nombre_archivo);
-    vector<Record> values;
+    vector<Record_hash> values;
 
     button_execute.setOnClick([&input, &savedText,&values,&button_limpiar]() {
         std::string text = input.getText();
@@ -62,9 +64,15 @@ int main(){
         std::cout << "Botón clickeado. Texto guardado: " << savedText << std::endl;
 
         input.clearText();
+        values = buscar_hash(246118);
+
+      //  values = buscar_range_avl(244196,264347);
+       // values = buscar_avl(246118);
       //  values  = ordenar_sequential();
       // values = buscar_sequential(246118);
-      values = buscar_range_sequential(244196,264347);
+      //values = buscar_range_sequential(244196,264347);
+
+
         button_limpiar.setOnClick([&values]() {
             values.clear();
             cout<<"registros_limpios"<<endl;
@@ -80,7 +88,9 @@ int main(){
         nombre_archivo = "../CSV/datos_10.csv";
         std::cout<<nombre_archivo<<endl;
         std::size_t longitud = std::strlen(nombre_archivo);
-        insertar_sequential(nombre_archivo);
+       // insertar_sequential(nombre_archivo);
+       // insertar_avl(nombre_archivo);
+        insertar_hash(nombre_archivo);
         cout<<longitud;
 
     });
