@@ -5,30 +5,33 @@
 #include <vector>
 #include <functional>
 using namespace std;
-// struct Record
-// {
-//     int cod;
-//     char nombre[12];
-//     int ciclo;
-//     long left = -1, right = -1;
-//     int height = 0;
-//     void setData();
-//     void showData();
-// };
-// void Record::setData(){
-//     cout << "Codigo: ";cin >> cod;
-//     cout << "Nombre: ";cin >> nombre;
-//     cout << "Ciclo: ";cin >> ciclo;
-// }
+struct Record_avl
+{
+    int id;
+    char name[12];
+    char surname[12];
+    int ciclo;
+    long left = -1, right = -1;
+    int height = 0;
+    void setData();
+    void showData();
+};
+void Record_avl::setData(){
+    cout << "Codigo: ";cin >> id;
+    cout << "Nombre: ";cin >> name;
+    cout << "Apellido: ";cin >> surname;
+    cout << "Ciclo: ";cin >> ciclo;
+}
 
-// void Record::showData(){
-//     cout << "\nCodigo: " << cod;
-//     cout << "\nNombre: " << nombre;
-//     cout << "\nCiclo : " << ciclo;
-//     cout << "\nleft : " << left;
-//     cout << "\nright : " << right <<endl;
-//     cout << "\nheight : " << height <<endl;
-// };
+void Record_avl::showData(){
+    cout << "\nCodigo: " << id;
+    cout << "\nNombre: " << name;
+    cout << "\nApellido: " << surname;
+    cout << "\nCiclo : " << ciclo;
+    cout << "\nleft : " << left;
+    cout << "\nright : " << right <<endl;
+    cout << "\nheight : " << height <<endl;
+};
 
 template <class T, typename TK>
 class AVLFile{

@@ -7,8 +7,9 @@
 using namespace std;
 struct Record
 {
-    int cod;
-    char nombre[12];
+    int id;
+    char name[12];
+    char surname[12];
     int ciclo;
     long left = -1, right = -1;
     int height = 0;
@@ -16,14 +17,16 @@ struct Record
     void showData();
 };
 void Record::setData(){
-    cout << "Codigo: ";cin >> cod;
-    cout << "Nombre: ";cin >> nombre;
+    cout << "Codigo: ";cin >> id;
+    cout << "Nombre: ";cin >> name;
+    cout << "Apellido: ";cin >> surname;
     cout << "Ciclo: ";cin >> ciclo;
 }
 
 void Record::showData(){
-    cout << "\nCodigo: " << cod;
-    cout << "\nNombre: " << nombre;
+    cout << "\nCodigo: " << id;
+    cout << "\nNombre: " << name;
+    cout << "\nApellido: " << surname;
     cout << "\nCiclo : " << ciclo;
     cout << "\nleft : " << left;
     cout << "\nright : " << right <<endl;

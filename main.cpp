@@ -146,8 +146,8 @@ int main(){
     // // Scanner scanner("insert into Customer values (72790028, Juan, 123456789)");
     // // Scanner scanner("create table Customer from file \"data.csv\" using index avl(NAME)");
 
-    Parser parser(&scanner);
-    if(!parser.parse()) cout << "Parse error" << endl;
+    // Parser parser(&scanner);
+    // if(!parser.parse()) cout << "Parse error" << endl;
     // print_datos_sequential("Customer.dat");
     Scanner scanner2("select * from Customer where id = 9");
     Parser parser2(&scanner2);

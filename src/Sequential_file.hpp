@@ -51,7 +51,6 @@ class SequentialFile {
     std::function<bool(const T &, const TK &)> greater_key;
 
 public:
-    static SequentialFile<T, TK>* instance;
     //singleton
     SequentialFile(string filename1, string filename2,
                 function<bool(const T &, const T &)> less,
@@ -72,9 +71,6 @@ public:
     T* search(TK key);
     vector<T> range_search(TK key1, TK key2);
 };
-template<class T, typename TK>
-SequentialFile<T, TK>* SequentialFile<T, TK>::instance = nullptr;
-
 
 template <class T, typename TK>
 SequentialFile<T, TK>::SequentialFile(string filename1, string filename2,
@@ -92,7 +88,6 @@ SequentialFile<T, TK>::SequentialFile(string filename1, string filename2,
     this->equal_key = equal_key;
     this->less_key = less_key;
     this->greater_key = greater_key;
-    this->instance = this;
 }
 
 template <class T, typename TK>
