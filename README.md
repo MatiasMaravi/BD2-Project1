@@ -63,6 +63,13 @@ De ser necesario en algunos casos se haran rotaciones dobles a la izquierda y de
 
 Numero 1:
 La eliminacion se realiza con la busqueda del registro a eliminar y presenta los casos correspondientes, si el nodo padre no tiene hijos (registros), se elimina directamente el registro.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/MatiasMaravi/BD2-Project1/main/Imagenes/AVLFile_img/AVLF1.png" height="400"/>
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/MatiasMaravi/BD2-Project1/main/Imagenes/AVLFile_img/AVLF2.png" height="400"/>
+</p>
 
 Numero 2:
 La eliminacion cuando el nodo padre solo tiene un hijo a la izquierda o a la derecha se cambia directamente el nodo con el padre y ahora el nodo padre es una hoja, que se puede eliminar, en el caso de registro se escribe el registro del nodo padre con el hijo.
