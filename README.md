@@ -6,6 +6,23 @@
 - Machaca Soloaga, Leandro
 - Maravi Anyosa, Matias
 - Sandoval Rivera, Jerimy
+## Introduccion:
+### Objetivo del proyecto:
+
+- Implementar estructura de datos en archivos para realizar una mejor busqueda de registros en archivos, para conseguir busquedas eficientes y rapidas.
+- Desarrollar algoritmos de busqueda con menor tiempo de ejecucion en el acceso a memoria secundaria
+  
+### Descripcion del dominio de datos a usar:
+**Falta**
+
+### Resultados que esperamos obtener mediante el uso de tecnicas de indexacion:
+
+- Verificar que el uso de estructura de datos vistos en clase son una mejor forma de acceder a registros en memoria secundaria.
+- Establecer que estructura de datos es la mas eficiente en tiempo de ejecucion y acceso a memoria secundaria.
+- Disminuir la cantidad de accesos a memoria a secundaria.
+- Ordenar los registros en memoria secundaria de una manera eficiente
+- Recuperacion y eliminacion eficiente de registros. 
+
 
 ## Técnicas de Organización de Archivos:
 ### Sequential File:
@@ -172,3 +189,10 @@ Al igual que el caso anterior, como se buscan en primera instancia los valores a
 Donde:
 - k: Número de registros en el "archivo auxiliar" del Sequential File
 - m: Tamaño del bucket del Extendible Hashing
+
+## Conclusiones
+
+- Sequential file es la estructura de datos menos conveniente a usar, por tener menor eficiencia que las otras que usamos.
+- AVl file es la estructura de datos con mejor tiempo de ejecucion en accesos a memoria secundaria.
+- Busqueda de registros en las 3 estructuras de datos implementadas son muy parecidas en cuestion de complejidad y acceso a memoria secundaria.
+
