@@ -118,15 +118,7 @@ bool Parser::parse_select(){
         Token value1 = *previous;
         if(!match(Token::AND)) return false;
         if(value1.type!=current->type) return false;
-        if(value1.type == Token::NUMBER){
-            int number1 = stoi(value1.lexema);
-            int number2 = stoi(current->lexema);
-            cout<<"Buscando en la tabla donde "<<key_table<<" entre "<<number1<<" y "<<number2<<endl;
-        }else{
-            string cadena1 = value1.lexema;
-            string cadena2 = current->lexema;
-            cout<<"Buscando en la tabla donde "<<key_table<<" entre "<<cadena1<<" y "<<cadena2<<endl;
-        }
+        search_sequential_range(key_table, table_name, value1.lexema, current->lexema);
     }
     return true;
 }

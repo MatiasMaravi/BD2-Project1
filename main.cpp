@@ -139,7 +139,7 @@ void print_datos_sequential(string data_file){
 
 // }
 int main(){
-    Scanner scanner("create table Customer from file \"archive/alumnos.csv\" using index sequential(id)");
+    Scanner scanner("create table Customer from file \"Data/datos_1000.csv\" using index avl(age)");
     // Scanner scanner("select * from Customer where name = Jorge");
     // // Scanner scanner("select * from Customer where NAME = Juan");
     // // Scanner scanner("select * from Customer where ALTURA between 75 and 100");
@@ -148,8 +148,8 @@ int main(){
 
     Parser parser(&scanner);
     if(!parser.parse()) cout << "Parse error" << endl;
-    print_datos_sequential("Customer.dat");
-    // Scanner scanner2("select * from Customer where id = 9");
+    // print_datos_sequential("Customer.dat");
+    // Scanner scanner2("select * from Customer where id between 20 and 300000");
     // Parser parser2(&scanner2);
     // if(!parser2.parse()) cout << "Parse error" << endl;
     return 0;

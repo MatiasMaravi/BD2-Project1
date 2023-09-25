@@ -17,7 +17,7 @@ struct Record_sequential {
     int next;
     char archivo;
 
-    void setData(int codigo, string name_, int valor_, int age, string _fecha, int _tamaño,string _nacionalidad){
+    void setData(int codigo, string name_, int valor_, int age, string _fecha, int _tamaño,string club,string _nacionalidad){
         this->id = codigo;
         strcpy(this->name, name_.c_str());
         this->value = valor_;
@@ -25,6 +25,7 @@ struct Record_sequential {
         strcpy(this->fecha, _fecha.c_str());
         this->tamaño = _tamaño;
         strcpy(this->nacionalidad, _nacionalidad.c_str());
+        strcpy(this->club, club.c_str());
         next = -1;
         archivo = 'd';
     }
@@ -228,7 +229,7 @@ void SequentialFile<T, TK>::reorganizar() {
     file2.seekp(0, ios::beg);
     for (auto r : records) {
         r.archivo = 'd';
-        r.showData();
+        // r.print();
         file2.write((char*) &r, sizeof(T));
     }
 
@@ -247,7 +248,7 @@ bool SequentialFile<T, TK>::insert(T record) {
     if (size_datos() == 0) {
         // Se guarda un puntero al inicio de todos los datos
         T cabecera;
-        cabecera.setData(2, "nombre", "valor", 20, "fecha", 170, "club", "nacionalidad");
+        cabecera.setData(2, "nombre", 3000, 20, "fecha", 170, "club", "nacionalidad");
         cabecera.next = 1;
         file.seekp(0, ios::end);
         file.write((char *)&cabecera, sizeof(record));
