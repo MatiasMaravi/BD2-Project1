@@ -189,6 +189,108 @@ Al igual que el caso anterior, como se buscan en primera instancia los valores a
 Donde:
 - k: Número de registros en el "archivo auxiliar" del Sequential File
 - m: Tamaño del bucket del Extendible Hashing
+## Parser
+### Descripción:
+Para nuestro Parser de sentencias SQL hacemos uso de las siguientes clases:
+- **Token**: Clase que representa un token de la sentencia SQL. Esta clase tiene un atributo de tipo enum que representa el tipo de token y un atributo de tipo string que representa el lexema del token.
+```cpp
+struct Token{
+    enum Type{SELECT, ALL, 
+                FROM, TABLE, 
+                WHERE, CREATE, 
+                INSERT, DELETE, 
+                VALUES, INTO, 
+                FILE, USING, 
+                INDEX, HASH,
+                AVL, SEQUENTIAL,
+                BETWEEN, AND,
+                STRING, NUMBER, 
+                EQUAL, ID,
+                LPAREN, RPAREN, VALUEPAREN,
+                END, ERR};
+    Type type;
+    static const char* token_names[25];
+    string lexema;
+    Token(Type): type(type){
+        lexema = "";
+    }
+    Token(Type type, const string lexema): type(type), lexema(lexema){}
+};
+```
+- **Scanner**: Clase que representa un scanner de la sentencia SQL. Esta clase tiene un atributo de tipo unordered_map que representa las palabras reservadas de la sentencia SQL y un atributo de tipo string que representa la sentencia SQL. Nos sirve para obtener los tokens de la sentencia SQL.
+```cpp
+class Scanner{
+public:
+    Scanner(const char* input);
+    Token* nextToken();
+    bool paren_flag = false;
+private:
+    unordered_map<string, Token::Type> reserved;
+    string input;
+    int first, current;
+    char nextChar();
+    void rollBack();
+    void startLexema();
+    void consume_white_spaces(char &c);
+    Token* scan_number(char &c);
+    Token* scan_alpha(char &c);
+    Token* scan_string(char &c);
+    Token* scan_lparen(char &c);
+    Token* scan_valueparen(char &c);
+    Token::Type checkReserved(string lexema);
+    string getLexema();
+};
+```
+- **Parser**: Clase que representa un parser de la sentencia SQL. Esta clase tiene un atributo de tipo Scanner que representa el scanner de la sentencia SQL. Es la clase que verifica la sintaxis de la sentencia SQL. También ejecuta las funciones correspondientes a las QuerysSQL
+```cpp
+class Parser{
+    Scanner* scanner;
+    Token* current, *previous;
+    bool match(Token::Type type);
+    bool check(Token::Type type);
+    bool advance();
+    bool isAtEnd();
+public:
+    Parser(Scanner* scanner):scanner(scanner){
+        previous = current = nullptr;
+    }
+    bool parse();
+    bool parse_create_table();
+    bool parse_select();
+    bool parse_insert();
+    bool parse_delete();
+};
+```
+## Multindexacion
+Para poder indexar un registro por cualquier atributo tuvimos que hacer uso de programación funcional, más especificamente Lambda Functions. Gracias a esto al momento de crear la estructura se define por cuál atributo del registro se va a indexar, buscar y eliminar.
+- Ejemplo:
+```cpp
+template <class T, typename TK>
+class AVLFile{
+    string filename;
+    long pos_root;
+    std::function<bool(const T &, const T &)> less;
+    std::function<bool(const T &, const T &)> greater;
+    std::function<bool(const T &, const TK &)> equal_key;
+    std::function<bool(const T &, const TK &)> less_key;
+    std::function<bool(const T &, const TK &)> greater_key;
+    std::function<TK(const T &)> get_key;
+    public:
+    //Resto del código...
+}
+```
+- Ejemplo de instancia
+```cpp
+    key = cod
+    AVLFile<Record,int> file("data.dat",
+                    []( Record const&a, Record const&b) { return a.cod < b.cod;}, //less
+                    []( Record const&a, Record const&b) { return a.cod > b.cod;}, //greater
+                    []( Record const&a, int const&b) { return a.cod == b;}, //equal_key
+                    []( Record const&a, int const&b) { return a.cod < b;}, //less_key
+                    []( Record const&a, int const&b) { return a.cod > b;}, //greater_key
+                    []( Record const&a) { return a.cod;} //get_key
+                        );
+```
 
 ## Conclusiones
 
