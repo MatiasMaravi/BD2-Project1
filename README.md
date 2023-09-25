@@ -146,3 +146,29 @@ En el algoritmo de Eliminación utilizaremos el algoritmo de búsqueda ya que bu
 
 - El número de buckets puede aumentar significativamente si se aplican hash a varios registros en el mismo bucket manteniendo la distribución de registros no uniforme.
 - Desperdicio de memoria debido a que ciertos depósitos contienen más datos que otros.
+
+## Accesos a Memoria Secundaria:
+### Inserción:
+- Sequential File: O(n)
+- AVL File: O(log n)
+- Extendible Hashing: O(log n)
+
+Entendemos que, tanto el AVL File como el Extendible Hashing, son las mejores opciones para insertar valores. Esto se debe a que el Sequential File depende de un caso importante, cuando el archivo auxiliar alcanza su tope. Cuando este sucede, se procede a reordenar, algo que no pasa con las demás técnicas.
+
+### Búsqueda:
+- Sequential File: O(log n + k)
+- AVL File: O(log n)
+- Extendible Hashing: O(log n + m)
+
+En este caso, podemos observar que el AVL File es el más eficiente para las búsquedas ya que no depende de ningún factor adicional, como lo son los tamaños de los archivos auxiliares y el contenido del bucket.
+
+### Eliminación:
+- Sequential File: O(log n + k)
+- AVL File: O(log n)
+- Extendible Hashing: O(log n + m)
+
+Al igual que el caso anterior, como se buscan en primera instancia los valores a eliminar, entonces utiliza la misma lógica. Por lo tanto, el AVL File sigue obteniendo la ventaja.
+
+Donde:
+- k: Número de registros en el "archivo auxiliar" del Sequential File
+- m: Tamaño del bucket del Extendible Hashing
