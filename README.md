@@ -86,11 +86,11 @@ Numero 3:
 La eliminacion cuando el nodo padre tiene dos hijos se busca al nodo izquierdo mayor del sub arbol de registros para intercambiar por el padre, en este casos e sobre escribe el padre con el hijo para luego realizar el remove del nodo repetido del sub-arbol, en este caso eliminar el registro una vez sobre escrito.
 
 <p align="center">
-  <img src="-" height="400"/>
+  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/AVLFile_img/AVLF6.png?raw=true" height="400"/>
 </p>
 
 <p align="center">
-  <img src="-" height="400"/>
+  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/AVLFile_img/AVLF7.png?raw=true" height="400"/>
 </p>
 
 Despues de cada eliminacion se realiza un balance y un update height al avl del archivo.
