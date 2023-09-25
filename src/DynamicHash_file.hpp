@@ -30,37 +30,37 @@ string to_binary(int n){
 
 // #define fb 226//4084/18
 //alumno
-// struct Record{
-//     int id;
-//     char name[50];
-//     int value;
-//     int age;
-//     char fecha[50];
-//     int tamaño;
-//     char club[50];
-//     char nacionalidad[50];
+struct Record_hash{
+    int id;
+    char name[50];
+    int value;
+    int age;
+    char fecha[50];
+    int tamaño;
+    char club[50];
+    char nacionalidad[50];
 
 
-//     Record(){}
+    Record_hash(){}
 
-//     Record(int codigo, string name_, int valor_, int age, string _fecha, int _tamaño,string _nacionalidad){
-//         this->id = codigo;
-//         strcpy(this->name, name_.c_str());
-//         this->value = valor_;
-//         this->age = age;
-//         strcpy(this->fecha, _fecha.c_str());
-//         this->tamaño = _tamaño;
-//         strcpy(this->nacionalidad, _nacionalidad.c_str());
-//     }
-//     void print(){
-//         cout<<"id: "<<id<<endl;
-//         cout<<"Nombre: "<<name<<endl;
-//         cout<<"valor: "<<value<<endl;
-//         cout<<"Edad: "<<age<<endl;
-//         cout<<"Fecha: "<<fecha<<endl;
-//         cout<<"Nacionalidad: "<<nacionalidad<<endl;
-//     }
-// };
+    Record_hash(int codigo, string name_, int valor_, int age, string _fecha, int _tamaño,string _nacionalidad){
+        this->id = codigo;
+        strcpy(this->name, name_.c_str());
+        this->value = valor_;
+        this->age = age;
+        strcpy(this->fecha, _fecha.c_str());
+        this->tamaño = _tamaño;
+        strcpy(this->nacionalidad, _nacionalidad.c_str());
+    }
+    void print(){
+        cout<<"id: "<<id<<endl;
+        cout<<"Nombre: "<<name<<endl;
+        cout<<"valor: "<<value<<endl;
+        cout<<"Edad: "<<age<<endl;
+        cout<<"Fecha: "<<fecha<<endl;
+        cout<<"Nacionalidad: "<<nacionalidad<<endl;
+    }
+};
 
 
 struct IndexEntry{

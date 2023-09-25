@@ -5,39 +5,70 @@
 #include <functional>
 
 using namespace std;
-
 struct Record_sequential {
     int id;
-    char name[20];
-    char surname[20];
-    int ciclo;
+    char name[50];
+    int value;
+    int age;
+    char fecha[50];
+    int tamaño;
+    char club[50];
+    char nacionalidad[50];
     int next;
     char archivo;
 
-    void setData() {
-        cout << "ID: "; cin >> id;
-        cout << "Name: "; cin >> name;
-        cout << "Surname: "; cin >> surname;
-        cout << "Ciclo: "; cin >> ciclo;
-        next = -1;
-        archivo = 'd';
-    }
-    void setData(int id_, string name_, string surname_, int ciclo_) {
-        this->id = id_;
+    void setData(int codigo, string name_, int valor_, int age, string _fecha, int _tamaño,string _nacionalidad){
+        this->id = codigo;
         strcpy(this->name, name_.c_str());
-        strcpy(this->surname, surname_.c_str());
-        this->ciclo = ciclo_;
+        this->value = valor_;
+        this->age = age;
+        strcpy(this->fecha, _fecha.c_str());
+        this->tamaño = _tamaño;
+        strcpy(this->nacionalidad, _nacionalidad.c_str());
         next = -1;
         archivo = 'd';
     }
-    void showData() {
-        cout << "ID: " << id << "\n";
-        cout << "Name: " << name << "\n";
-        cout << "Surname: " << surname << "\n";
-        cout << "Ciclo: " << ciclo << "\n";
-        cout << "Next: " << next << archivo << "\n\n";
+    void print(){
+        cout<<"id: "<<id<<endl;
+        cout<<"Nombre: "<<name<<endl;
+        cout<<"valor: "<<value<<endl;
+        cout<<"Edad: "<<age<<endl;
+        cout<<"Fecha: "<<fecha<<endl;
+        cout<<"Nacionalidad: "<<nacionalidad<<endl;
     }
 };
+// struct Record_sequential {
+//     int id;
+//     char name[20];
+//     char surname[20];
+//     int ciclo;
+//     int next;
+//     char archivo;
+
+//     void setData() {
+//         cout << "ID: "; cin >> id;
+//         cout << "Name: "; cin >> name;
+//         cout << "Surname: "; cin >> surname;
+//         cout << "Ciclo: "; cin >> ciclo;
+//         next = -1;
+//         archivo = 'd';
+//     }
+//     void setData(int id_, string name_, string surname_, int ciclo_) {
+//         this->id = id_;
+//         strcpy(this->name, name_.c_str());
+//         strcpy(this->surname, surname_.c_str());
+//         this->ciclo = ciclo_;
+//         next = -1;
+//         archivo = 'd';
+//     }
+//     void showData() {
+//         cout << "ID: " << id << "\n";
+//         cout << "Name: " << name << "\n";
+//         cout << "Surname: " << surname << "\n";
+//         cout << "Ciclo: " << ciclo << "\n";
+//         cout << "Next: " << next << archivo << "\n\n";
+//     }
+// };
 
 template <class T, typename TK>
 class SequentialFile {
@@ -216,7 +247,7 @@ bool SequentialFile<T, TK>::insert(T record) {
     if (size_datos() == 0) {
         // Se guarda un puntero al inicio de todos los datos
         T cabecera;
-        cabecera.setData(2, "nombre", "apellido", 1);
+        cabecera.setData(2, "nombre", "valor", 20, "fecha", 170, "club", "nacionalidad");
         cabecera.next = 1;
         file.seekp(0, ios::end);
         file.write((char *)&cabecera, sizeof(record));
@@ -449,7 +480,7 @@ T* SequentialFile<T, TK>::search(TK key) {
     if (result.archivo == 'a' && result.next == -1) return nullptr;
     
     T* r = new T;
-    r->setData(result.id, result.name, result.surname, result.ciclo);
+    r->setData(result.id,result.name,result.value,result.age,result.fecha,result.tamaño,result.club,result.nacionalidad);
     return (equal_key(result,key))? r : nullptr;
 }
 
