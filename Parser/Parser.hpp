@@ -9,8 +9,42 @@ Sentences:
 */
 
 #include "Scanner.hpp"
-#include "../SequentialFile/sequential_file.hpp"
+#include "../src/Sequential_file.hpp"
+#include "../src/Avl_file.hpp"
+#include "../src/DynamicHash_file.hpp"
 
+struct Record_sequential {
+    int id;
+    char name[20];
+    char surname[20];
+    int ciclo;
+    int next;
+    char archivo;
+
+    void setData() {
+        cout << "ID: "; cin >> id;
+        cout << "Name: "; cin >> name;
+        cout << "Surname: "; cin >> surname;
+        cout << "Ciclo: "; cin >> ciclo;
+        next = -1;
+        archivo = 'd';
+    }
+    void setData(int id_, string name_, string surname_, int ciclo_) {
+        this->id = id_;
+        strcpy(this->name, name_.c_str());
+        strcpy(this->surname, surname_.c_str());
+        this->ciclo = ciclo_;
+        next = -1;
+        archivo = 'd';
+    }
+    void showData() {
+        cout << "ID: " << id << "\n";
+        cout << "Name: " << name << "\n";
+        cout << "Surname: " << surname << "\n";
+        cout << "Ciclo: " << ciclo << "\n";
+        cout << "Next: " << next << archivo << "\n\n";
+    }
+};
 
 class Parser{
     Scanner* scanner;
@@ -59,7 +93,7 @@ bool Parser::isAtEnd() {
     return (current->type == Token::END);
 }
 
-void leer_record(string line, Record &record, string key_table){
+void leer_record(string line, Record_sequential &record){
     stringstream ss(line);
     string campo;
     getline(ss, campo, ',');
@@ -73,38 +107,78 @@ void leer_record(string line, Record &record, string key_table){
     record.setData(id, name, surname, ciclo);
     
 }
-template <typename T>
-void create_sequential(string key_table, string table_name, ifstream &file_){
+template <typename T,typename TK>
+SequentialFile<T,TK> create_sequential(string key_table, string table_name, ifstream &file_){
     cout<<"Creando indice secuencial con key "<<key_table<<endl;
+    Record_sequential record;
+    SequentialFile<T,TK> file(table_name + ".dat", "auxiliar.dat");
+    if(key_table == "id"){
+        file.asignar_lamda_functions(
+                []( Record const&a, Record const&b) { return a.id < b.id;},
+                []( Record const&a,  Record const&b) { return a.id > b.id;},
+                []( Record const&a,  Record const&b) { return a.id == b.id;},
+                []( Record const&a,  int const&b) { return a.id == b;},
+                []( Record const&a,  int const&b) { return a.id < b;},
+                []( Record const&a,  int const&b) { return a.id > b;}
+                );
 
-    SequentialFile<T> file(table_name + ".dat", "auxiliar.dat");
-    Record record;
+    }else if(key_table == "ciclo"){
+        file.asignar_lamda_functions(
+                []( Record const&a, Record const&b) { return a.ciclo < b.ciclo;},
+                []( Record const&a,  Record const&b) { return a.ciclo > b.ciclo;},
+                []( Record const&a,  Record const&b) { return a.ciclo == b.ciclo;},
+                []( Record const&a,  int const&b) { return a.ciclo == b;},
+                []( Record const&a,  int const&b) { return a.ciclo < b;},
+                []( Record const&a,  int const&b) { return a.ciclo > b;}
+                );
+    }else if(key_table == "name"){
+        file.asignar_lamda_functions(
+                []( Record const&a, Record const&b) { return strcmp(a.name,b.name) < 0 ;},
+                []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) > 0 ;},
+                []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) == 0 ;},
+                []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) == 0 ;},
+                []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) < 0 ;},
+                []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) > 0 ;}
+                );
+    }else if(key_table == "surname"){
+        file.asignar_lamda_functions(
+                []( Record const&a, Record const&b) { return strcmp(a.surname,b.surname) < 0 ;},
+                []( Record const&a,  Record const&b) { return strcmp(a.surname,b.surname) > 0 ;},
+                []( Record const&a,  Record const&b) { return strcmp(a.surname,b.surname) == 0 ;},
+                []( Record const&a,  string const&b) { return strcmp(a.surname,b.c_str()) == 0 ;},
+                []( Record const&a,  string const&b) { return strcmp(a.surname,b.c_str()) < 0 ;},
+                []( Record const&a,  string const&b) { return strcmp(a.surname,b.c_str()) > 0 ;}
+                );
+    }else{
+        cout<<"Key no encontrado, id por defecto"<<endl;
+    }
     string campo, line;
     while(getline(file_, line)){
-        leer_record(line, record, key_table);
+        leer_record(line, record);
         file.insert(record);
     }
     file_.close();
+    return file;
 }
-template <typename T>
-void search_sequential(string key_table, string table_name, string cadena){
-    cout<<"Buscando en la tabla "<<table_name<<" con key "<<key_table<< " donde "<<key_table<<" = "<<cadena<<endl;
-    SequentialFile<T> file(table_name + ".dat", "auxiliar.dat");
-    Record* record = file.search(cadena);
-    if(record){
-        record->showData();
-    }else{
-        cout<<"No existe este registro"<<endl;
-    }
-}
+// template <typename T>
+// void search_sequential(string key_table, string table_name, string cadena){
+//     cout<<"Buscando en la tabla "<<table_name<<" con key "<<key_table<< " donde "<<key_table<<" = "<<cadena<<endl;
+//     SequentialFile<T> file(table_name + ".dat", "auxiliar.dat");
+//     Record* record = file.search(cadena);
+//     if(record){
+//         record->showData();
+//     }else{
+//         cout<<"No existe este registro"<<endl;
+//     }
+// }
 void leer_csv(string table_name, string filename, Token::Type index_type, string key_table){
     ifstream file_(filename);
     string line;
     getline(file_, line);
 
     if(index_type == Token::SEQUENTIAL){
-        if(key_table == "id" || key_table == "ciclo") create_sequential<int>(key_table, table_name, file_);
-        else create_sequential<string>(key_table, table_name, file_);
+        if(key_table == "id" || key_table == "ciclo") create_sequential<Record_sequential,int>(key_table, table_name, file_);
+        else create_sequential<Record_sequential,string>(key_table, table_name, file_);
     }
     // else if(index_type == Token::AVL){
     //     cout<<"Creando indice AVL con key "<<key_table<<endl;

@@ -76,11 +76,11 @@ bool key_exist(string key, string line){
 void print_datos_sequential(string data_file){
     cout << data_file << endl;
     fstream file1(data_file, ios::app | ios::in | ios::binary);
-    Record cabecera;
+    Record_sequential cabecera;
     file1.seekg(0, ios::beg);
     file1.read((char *)&cabecera, sizeof(cabecera));
     cout << cabecera.next << " " << cabecera.archivo << endl;
-    Record current;
+    Record_sequential current;
     file1.read((char *)&current, sizeof(current));
     while (!file1.eof()) {
         cout << current.id << " " << current.name << " " << current.surname << " " << current.ciclo << " " << current.next << " " << current.archivo << endl;
@@ -139,20 +139,15 @@ void print_range_sequential(T key = "name"){
 
 }
 int main(){
-
-    
-
-    // string s;
-    // cin>>s;
-    // Scanner scanner("create table Customer from file \"archive/alumnos.csv\" using index sequential(name)");
+    Scanner scanner("create table Customer from file \"archive/alumnos.csv\" using index sequential(name)");
     // Scanner scanner("select * from Customer where name = Jorge");
     // // Scanner scanner("select * from Customer where NAME = Juan");
     // // Scanner scanner("select * from Customer where ALTURA between 75 and 100");
     // // Scanner scanner("insert into Customer values (72790028, Juan, 123456789)");
     // // Scanner scanner("create table Customer from file \"data.csv\" using index avl(NAME)");
 
-    // Parser parser(&scanner);
-    // if(!parser.parse()) cout << "Parse error" << endl;
-    print_datos_sequential("Customer.dat");
+    Parser parser(&scanner);
+    if(!parser.parse()) cout << "Parse error" << endl;
+    // print_datos_sequential("Customer.dat");
     return 0;
 }
