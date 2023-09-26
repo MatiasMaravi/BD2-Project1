@@ -1,6 +1,6 @@
-#include "../src/Sequential_file.hpp"
-#include "../src/Avl_file.hpp"
-#include "../src/DynamicHash_file.hpp"
+#include "Sequential_file.hpp"
+#include "Avl_file.hpp"
+#include "DynamicHash_file.hpp"
 #include "sstream"
 #include "Scanner.hpp"
 #include <vector>
