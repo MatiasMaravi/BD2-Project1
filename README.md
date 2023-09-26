@@ -228,20 +228,20 @@ Donde:
 ### Insert:
 Cabe resaltar que  la capacidad maxima del aux.dat del SequentialFile es 200
 
-![image](imagenes/Insert.png)
+![image](Imagenes/Insert.png)
 
 
 ### Remove:
-![image](imagenes/Remove.png)
+![image](Imagenes/Remove.png)
 
 
 ### Search:
 
-![image](imagenes/Search.png)
+![image](Imagenes/Search.png)
 
 ### Search_range:
 
-![image](imagenes/Search_range.png)
+![image](Imagenes/Search_range.png)
 
 
 ## Parser
@@ -365,7 +365,7 @@ Nos basamos en la documentacion de la libreria:
 ### Visualizacion de la interfaz
 
 
-![image](imagenes/Interfaz.png)
+![image](Imagenes/Interfaz.png)
 
 ## Conclusiones
 
