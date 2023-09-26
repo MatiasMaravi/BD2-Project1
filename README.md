@@ -13,7 +13,39 @@
 - Desarrollar algoritmos de busqueda con menor tiempo de ejecucion en el acceso a memoria secundaria
   
 ### Descripcion del dominio de datos a usar:
-**Falta**
+
+usaremos 4 Datasets de diferentes cantidaes de registros:
+ - Datos_1000.csv
+ - Datos_10000.csv
+ - Datos_50000.csv
+ - Datos_100000.csv
+
+```cpp
+struct Record_uni {
+    int player_id;
+    char short_name[50];
+    int value_eur;
+    int age;
+    char club_name[50];
+    char nationality_name[50];
+    long left = -1, right = -1;
+    int height = 0;
+    int next;
+    char archivo;
+
+    void setData(int player_id_, const char* short_name_,
+                int value_eur_, int age_, const char* club_name_,
+                const char* nationality_name_) {
+        this->player_id = player_id_;
+        strcpy(this->short_name, short_name_);
+        this->value_eur = value_eur_;
+        this->age = age_;
+        strcpy(this->club_name, club_name_);
+        strcpy(this->nationality_name, nationality_name_);
+
+    }
+};
+```
 
 ### Resultados que esperamos obtener mediante el uso de tecnicas de indexacion:
 
@@ -189,6 +221,28 @@ Al igual que el caso anterior, como se buscan en primera instancia los valores a
 Donde:
 - k: Número de registros en el "archivo auxiliar" del Sequential File
 - m: Tamaño del bucket del Extendible Hashing
+
+## Comparacion de Tiempos de Ejecucion
+
+### Insert:
+Cabe resaltar que  la capacidad maxima del aux.dat del SequentialFile es 200
+
+![image](imagenes/Insert.png)
+
+
+### Remove:
+![image](imagenes/Remove.png)
+
+
+### Search:
+
+![image](imagenes/Search.png)
+
+### Search_range:
+
+![image](imagenes/Search_range.png)
+
+  
 ## Parser
 ### Descripción:
 Para nuestro Parser de sentencias SQL hacemos uso de las siguientes clases:
@@ -291,6 +345,28 @@ class AVLFile{
                     []( Record const&a) { return a.cod;} //get_key
                         );
 ```
+
+## Interfaz
+
+### SFML:  
+
+Utilizamos la libreria SFML de C++ para relaizar al interfaz. Para ello utilizamos distintos archivos como:
+- Textinut.h
+- Button.h
+- Label.h
+- interfaz_main.cpp (main principal)
+- Los archivos que manejan la interfaz de cada estructura
+
+Nos basamos en la documentacion de la libreria:
+
+[Documentacion de SFML](https://www.sfml-dev.org/documentation/2.6.0/)
+
+### Visualizacion de la interfaz
+
+
+![image](imagenes/Interfaz.png)
+
+
 
 ## Conclusiones
 
