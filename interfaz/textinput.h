@@ -18,7 +18,6 @@ private:
     bool isPassword;
     bool isSelected;
 
-
 public:
     TextInput(float x, float y, float width, float height, bool password = false)
             : isPassword(password), isSelected(false) {

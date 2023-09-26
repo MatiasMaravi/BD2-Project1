@@ -21,25 +21,18 @@ SequentialFile<T, TK>::SequentialFile(string filename1, string filename2,
 }
 */
 int main() {
-    //Key name
-    SequentialFile<Record, string> file("datos.dat", "auxiliar.dat",
-                    []( Record const&a, Record const&b) { return strcmp(a.name,b.name) < 0 ;},
-                    []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) > 0 ;},
-                    []( Record const&a,  Record const&b) { return strcmp(a.name,b.name) == 0 ;},
-                    []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) == 0 ;},
-                    []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) < 0 ;},
-                    []( Record const&a,  string const&b) { return strcmp(a.name,b.c_str()) > 0 ;}
-                    );
 
     //Key ciclo
-    // SequentialFile<Record, int> file("datos.dat", "auxiliar.dat",
-    //             []( Record const&a, Record const&b) { return a.ciclo < b.ciclo;},
-    //             []( Record const&a,  Record const&b) { return a.ciclo > b.ciclo;},
-    //             []( Record const&a,  Record const&b) { return a.ciclo == b.ciclo;},
-    //             []( Record const&a,  int const&b) { return a.ciclo == b;},
-    //             []( Record const&a,  int const&b) { return a.ciclo < b;},
-    //             []( Record const&a,  int const&b) { return a.ciclo > b;}
-    //             );
+    SequentialFile<Record, int> file("datos4.dat", "auxiliar4.dat",
+                []( Record const&a, Record const&b) { return a.ciclo < b.ciclo;},
+                []( Record const&a,  Record const&b) { return a.ciclo > b.ciclo;},
+                []( Record const&a,  Record const&b) { return a.ciclo == b.ciclo;},
+                []( Record const&a,  int const&b) { return a.ciclo == b;},
+                []( Record const&a,  int const&b) { return a.ciclo < b;},
+                []( Record const&a,  int const&b) { return a.ciclo > b;}
+                );
+
+
     Record record;
     record.setData(1, "Andres", "Perez", 1);
     file.insert(record);
@@ -118,6 +111,10 @@ int main() {
     // if (file.remove("Jorge")) cout << "Se elimino Jorge\n";
     // else cout << "No se elimino Jorge\n";
     cout << "Reorganizar\n:";
+//    vector<Record> registrosOrdenados = file.reorganizar();
+//    for ( Record& registro : registrosOrdenados) {
+//        registro.showData();
+//    }
     file.reorganizar();
     return 0;
 }

@@ -34,3 +34,8 @@ archive/
 *.exe
 *.out
 *.app
+
+#cmake
+.idea/
+CMakeLists.txt
+cmake-build-debug/

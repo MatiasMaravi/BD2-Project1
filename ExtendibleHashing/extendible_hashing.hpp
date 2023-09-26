@@ -5,6 +5,9 @@
 #include <string>
 #include<cstring>
 #include<functional>
+
+#include "Record_hash.h"
+
 using namespace std;
 unsigned long long D = 3;
 
@@ -27,41 +30,6 @@ string to_binary(int n){
     
     return binary_string;
 }
-
-// #define fb 226//4084/18
-//alumno
-struct Record{
-    int id;
-    char name[50];
-    int value;
-    int age;
-    char fecha[50];
-    int tamaño;
-    char club[50];
-    char nacionalidad[50];
-
-
-    Record(){}
-
-    Record(int codigo, string name_, int valor_, int age, string _fecha, int _tamaño,string _nacionalidad){
-        this->id = codigo;
-        strcpy(this->name, name_.c_str());
-        this->value = valor_;
-        this->age = age;
-        strcpy(this->fecha, _fecha.c_str());
-        this->tamaño = _tamaño;
-        strcpy(this->nacionalidad, _nacionalidad.c_str());
-    }
-    void print(){
-        cout<<"id: "<<id<<endl;
-        cout<<"Nombre: "<<name<<endl;
-        cout<<"valor: "<<value<<endl;
-        cout<<"Edad: "<<age<<endl;
-        cout<<"Fecha: "<<fecha<<endl;
-        cout<<"Nacionalidad: "<<nacionalidad<<endl;
-    }
-};
-
 
 struct IndexEntry{
     int pos_left;//0
@@ -161,6 +129,9 @@ class DynamicHash{
     function<unsigned long (const TK &)> hash_function;
     function<bool(const T &, const TK &)> equal_key;
 
+    static DynamicHash<T, TK>* instance;
+
+
 public:
     DynamicHash(string fileName_buckets, string fileName_index,
                 function<TK(const T &)> get_key,
@@ -168,9 +139,24 @@ public:
                 function<bool(const T &, const TK &)> equal_key,
                 int fb = 4);
 
+
+    static DynamicHash<T, TK>& getInstance(string fileName_buckets, string fileName_index,
+                                           function<TK(const T &)> get_key,
+                                           function<unsigned long(const TK &)> hash_function,
+                                           function<bool(const T &, const TK &)> equal_key,
+                                           int fb = 4) {
+        static DynamicHash<T, TK> instance(fileName_buckets, fileName_index, get_key, hash_function, equal_key,fb);
+        return instance;
+    }
+
+    ~DynamicHash() {
+        delete instance;
+    }
+
     bool add(T record);
 
-    void aumentar_buckets(fstream &file, fstream &file2,int pos,int post_bucket,string binario,int &indice, Record record);
+    void aumentar_buckets(fstream &file, fstream &file2,int pos,int post_bucket,string binario,int &indice, T record);
+
 
     bool enlazar_bucket(fstream &file,int post_bucket,T record);
 
@@ -182,13 +168,23 @@ public:
 
     T search(fstream &file, fstream &file2, string binary, int &pos, int &indice, TK key);
 
-    T search(TK key);
+
+    vector<T> search(TK key);
+
 
     bool remove(TK key);
 
     bool remove(fstream &file, fstream &file2, string binary, int &pos, int &indice, TK key);
 };
+
+
+
+template <class T, typename TK>
+DynamicHash<T, TK>* DynamicHash<T, TK>::instance = nullptr;
 //Constructor
+
+
+
 template <class T, typename TK>
 DynamicHash<T,TK>::DynamicHash(string fileName_buckets, string fileName_index,
                                 function<TK(const T &)> get_key,
@@ -250,7 +246,8 @@ bool DynamicHash<T,TK>::add(T record){
     return res;
 }
 template <class T, typename TK>
-void DynamicHash<T,TK>::aumentar_buckets(fstream &file, fstream &file2,int pos,int post_bucket,string binario,int &indice, Record record){
+void DynamicHash<T,TK>::aumentar_buckets(fstream &file, fstream &file2,int pos,int post_bucket,string binario,int &indice, T record){
+
     if(M<pow(2,D)){
         // Obtener bucket
         Bucket<T> bucket;
@@ -456,7 +453,9 @@ T DynamicHash<T,TK>::search(fstream &file, fstream &file2, string binary, int &p
     }
 }
 template <class T, typename TK>
-T DynamicHash<T,TK>::search(TK key){
+vector<T> DynamicHash<T,TK>::search(TK key){
+    vector<T> final;
+
     string binary = to_binary(hash_function(key));//string binary = to_binary(hash_int(key));
     fstream file(fileName_buckets,ios::binary|ios::in|ios::out);
     fstream file2(fileName_index,ios::binary|ios::in|ios::out);
@@ -465,9 +464,10 @@ T DynamicHash<T,TK>::search(TK key){
     if (binary[indice]=='0')pos = 0;
     else pos = sizeof(IndexEntry);
     T temp=search(file, file2, binary, pos, indice, key);
+    final.push_back(temp);
     file.close();
     file2.close();
-    return temp;
+    return final;
 }
 template <class T, typename TK>
 bool DynamicHash<T,TK>::remove(TK key){

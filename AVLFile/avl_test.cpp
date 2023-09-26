@@ -89,14 +89,18 @@ int main(){
     //                 []( Record const&a) { return a.cod;} //get_key
     //                     );
     //key = name
-    AVLFile<Record,string> file("data.dat",
-                    []( Record const&a, Record const&b) { return strcmp(a.nombre,b.nombre) < 0;}, //less
-                    []( Record const&a, Record const&b) { return strcmp(a.nombre,b.nombre) > 0;}, //greater
-                    []( Record const&a, string const&b) { return strcmp(a.nombre,b.c_str()) == 0;}, //equal_key
-                    []( Record const&a, string const&b) { return strcmp(a.nombre,b.c_str()) < 0;}, //less_key
-                    []( Record const&a, string const&b) { return strcmp(a.nombre,b.c_str()) > 0;}, //greater_key
-                    []( Record const&a) { return a.nombre;} //get_key
-                    );
-    test(file);
+
+
+//
+//    AVLFile<Record,string> file("data.dat",
+//                    []( Record const&a, Record const&b) { return strcmp(a.nombre,b.nombre) < 0;}, //less
+//                    []( Record const&a, Record const&b) { return strcmp(a.nombre,b.nombre) > 0;}, //greater
+//                    []( Record const&a, string const&b) { return strcmp(a.nombre,b.c_str()) == 0;}, //equal_key
+//                    []( Record const&a, string const&b) { return strcmp(a.nombre,b.c_str()) < 0;}, //less_key
+//                    []( Record const&a, string const&b) { return strcmp(a.nombre,b.c_str()) > 0;}, //greater_key
+//                    []( Record const&a) { return a.nombre;} //get_key
+//                    );
+//    test(file);
+
     return 0;
 }
