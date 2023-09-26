@@ -8,9 +8,28 @@ Sentences:
 
 */
 
-#include "Scanner.hpp"
-#include "../SequentialFile/sequential_file.hpp"
+#include "utils.hpp"
 
+void leer_csv(string table_name, string filename, Token::Type index_type, string key_table){
+    ifstream file_(filename);
+    string line;
+    getline(file_, line);
+
+    if(index_type == Token::SEQUENTIAL){
+        create_sequential(key_table, table_name, file_);
+    }else if(index_type == Token::AVL){
+        
+    }
+    // else if(index_type == Token::AVL){
+    //     cout<<"Creando indice AVL con key "<<key_table<<endl;
+    //     cout<<"Ruta: "<<filename<<endl;}
+    // else if(index_type == Token::HASH)
+    //     cout<<"Creando indice hash con key "<<key_table<<endl;
+    else
+        cout<<"Error"<<endl;
+
+
+}
 
 class Parser{
     Scanner* scanner;
@@ -59,64 +78,6 @@ bool Parser::isAtEnd() {
     return (current->type == Token::END);
 }
 
-void leer_record(string line, Record &record, string key_table){
-    stringstream ss(line);
-    string campo;
-    getline(ss, campo, ',');
-    int id = stoi(campo);
-    getline(ss, campo, ',');
-    string name = campo;
-    getline(ss, campo, ',');
-    string surname = campo;
-    getline(ss, campo, ',');
-    int ciclo = stoi(campo);
-    record.setData(id, name, surname, ciclo);
-    
-}
-template <typename T>
-void create_sequential(string key_table, string table_name, ifstream &file_){
-    cout<<"Creando indice secuencial con key "<<key_table<<endl;
-
-    SequentialFile<T> file(table_name + ".dat", "auxiliar.dat");
-    Record record;
-    string campo, line;
-    while(getline(file_, line)){
-        leer_record(line, record, key_table);
-        file.insert(record);
-    }
-    file_.close();
-}
-template <typename T>
-void search_sequential(string key_table, string table_name, string cadena){
-    cout<<"Buscando en la tabla "<<table_name<<" con key "<<key_table<< " donde "<<key_table<<" = "<<cadena<<endl;
-    SequentialFile<T> file(table_name + ".dat", "auxiliar.dat");
-    Record* record = file.search(cadena);
-    if(record){
-        record->showData();
-    }else{
-        cout<<"No existe este registro"<<endl;
-    }
-}
-void leer_csv(string table_name, string filename, Token::Type index_type, string key_table){
-    ifstream file_(filename);
-    string line;
-    getline(file_, line);
-
-    if(index_type == Token::SEQUENTIAL){
-        if(key_table == "id" || key_table == "ciclo") create_sequential<int>(key_table, table_name, file_);
-        else create_sequential<string>(key_table, table_name, file_);
-    }
-    // else if(index_type == Token::AVL){
-    //     cout<<"Creando indice AVL con key "<<key_table<<endl;
-    //     cout<<"Ruta: "<<filename<<endl;}
-    // else if(index_type == Token::HASH)
-    //     cout<<"Creando indice hash con key "<<key_table<<endl;
-    else
-        cout<<"Error"<<endl;
-
-
-}
-
 bool Parser::parse_create_table(){
     if(!match(Token::CREATE)) return false;
     if(!match(Token::TABLE)) return false;
@@ -149,21 +110,15 @@ bool Parser::parse_select(){
     if(!match(Token::EQUAL) && !match(Token::BETWEEN)) return false;
     if(previous->type == Token::EQUAL){
         if(!match(Token::ID) && !match(Token::NUMBER)) return false;
-        //No implementado
+        Token value1 = *previous;
+        search_sequential(key_table, table_name, value1.lexema);
+
     }else{
         if(!match(Token::NUMBER) && !match(Token::ID)) return false;
         Token value1 = *previous;
         if(!match(Token::AND)) return false;
         if(value1.type!=current->type) return false;
-        if(value1.type == Token::NUMBER){
-            int number1 = stoi(value1.lexema);
-            int number2 = stoi(current->lexema);
-            cout<<"Buscando en la tabla donde "<<key_table<<" entre "<<number1<<" y "<<number2<<endl;
-        }else{
-            string cadena1 = value1.lexema;
-            string cadena2 = current->lexema;
-            cout<<"Buscando en la tabla donde "<<key_table<<" entre "<<cadena1<<" y "<<cadena2<<endl;
-        }
+        search_sequential_range(key_table, table_name, value1.lexema, current->lexema);
     }
     return true;
 }

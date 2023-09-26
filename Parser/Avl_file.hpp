@@ -4,11 +4,34 @@
 #include <climits>
 #include <vector>
 #include <functional>
-
-#include "../AVLFile/Record_avl.h"
 using namespace std;
+struct Record_avl
+{
+    int id;
+    char name[12];
+    char surname[12];
+    int ciclo;
+    long left = -1, right = -1;
+    int height = 0;
+    void setData();
+    void showData();
+};
+void Record_avl::setData(){
+    cout << "Codigo: ";cin >> id;
+    cout << "Nombre: ";cin >> name;
+    cout << "Apellido: ";cin >> surname;
+    cout << "Ciclo: ";cin >> ciclo;
+}
 
-
+void Record_avl::showData(){
+    cout << "\nCodigo: " << id;
+    cout << "\nNombre: " << name;
+    cout << "\nApellido: " << surname;
+    cout << "\nCiclo : " << ciclo;
+    cout << "\nleft : " << left;
+    cout << "\nright : " << right <<endl;
+    cout << "\nheight : " << height <<endl;
+};
 
 template <class T, typename TK>
 class AVLFile{
@@ -21,9 +44,6 @@ private:
     std::function<bool(const T &, const TK &)> less_key;
     std::function<bool(const T &, const TK &)> greater_key;
     std::function<TK(const T &)> get_key;
-
-    static AVLFile<T, TK>* instance;
-
 public:
     AVLFile(string filename,
             function<bool(const T &, const T &)> less,
@@ -33,18 +53,7 @@ public:
             function<bool(const T &, const TK &)> greater_key,
             function<TK(const T &)> get_key);
 
-    static AVLFile<T, TK>& getInstance(string filename,
-                                              function<bool(const T &, const T &)> less,
-                                              function<bool(const T &, const T &)> greater,
-                                              function<bool(const T &, const TK &)> equal_key,
-                                              function<bool(const T &, const TK &)> less_key,
-                                              function<bool(const T &, const TK &)> greater_key,
-                                              function<TK(const T &)> get_key) {
-        static AVLFile<T, TK> instance(filename, less, greater, equal_key, less_key, greater_key,get_key);
-        return instance;
-    }
-
-    vector<T> find(TK key);
+    T find(TK key);
 
     void insert(T record);
 
@@ -53,11 +62,6 @@ public:
     vector<T> inorder();
 
     vector<T> rangeSearch(TK begin_key, TK end_key);
-    
-    ~AVLFile() {
-        delete instance;
-    }
-
 
 private:
     void inorder(long pos_node, vector<T> &result, fstream &file);
@@ -88,10 +92,6 @@ private:
 
     vector<T> rangeSearch(fstream &file, TK begin_key, TK end_key ,long &pos_node, vector<T> &result);
 };
-
-template <class T, typename TK>
-AVLFile<T, TK>* AVLFile<T, TK>::instance = nullptr;
-
 //Constructor
 template<class T, typename TK>
 AVLFile<T, TK>::AVLFile(string filename,
@@ -120,15 +120,6 @@ AVLFile<T, TK>::AVLFile(string filename,
 
 }
 template<class T, typename TK>
-vector<T> AVLFile<T,TK>::find(TK key){
-    vector<T> final;
-    fstream file(this->filename, ios::app | ios::binary | ios::in | ios::out);
-    if (!file.is_open()) throw std::runtime_error("No se pudo abrir el archivo");
-    T record = find(pos_root,key,file);
-    final.push_back(record);
-    file.close();
-    return final;
-
 T AVLFile<T,TK>::find(TK key){
     fstream file(this->filename, ios::app | ios::binary | ios::in | ios::out);
     if (!file.is_open()) throw std::runtime_error("No se pudo abrir el archivo");
@@ -195,7 +186,6 @@ T AVLFile<T,TK>::find(long pos_node, TK key, fstream &file){
     file.seekg(pos_node, ios::beg);
     T record;
     file.read((char*) &record, sizeof(T));
-
 
     if(equal_key(record,key))return record; //if(record.cod == key) return record;
     else if(greater_key(record,key)) return find(record.left, key, file); //else if(record.cod > key) return find(record.left, key, file);

@@ -281,15 +281,15 @@ class AVLFile{
 ```
 - Ejemplo de instancia
 ```cpp
-    key = cod
-    AVLFile<Record,int> file("data.dat",
-                    []( Record const&a, Record const&b) { return a.cod < b.cod;}, //less
-                    []( Record const&a, Record const&b) { return a.cod > b.cod;}, //greater
-                    []( Record const&a, int const&b) { return a.cod == b;}, //equal_key
-                    []( Record const&a, int const&b) { return a.cod < b;}, //less_key
-                    []( Record const&a, int const&b) { return a.cod > b;}, //greater_key
-                    []( Record const&a) { return a.cod;} //get_key
-                        );
+// key = cod
+AVLFile<Record,int> file("data.dat",
+  []( Record const&a, Record const&b) { return a.cod < b.cod;}, //less
+  []( Record const&a, Record const&b) { return a.cod > b.cod;}, //greater
+  []( Record const&a, int const&b) { return a.cod == b;}, //equal_key
+  []( Record const&a, int const&b) { return a.cod < b;}, //less_key
+  []( Record const&a, int const&b) { return a.cod > b;}, //greater_key
+  []( Record const&a) { return a.cod;} //get_key
+      );
 ```
 
 ## Conclusiones

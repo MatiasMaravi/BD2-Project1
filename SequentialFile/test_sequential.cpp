@@ -24,39 +24,22 @@ int main() {
 
     //Key ciclo
     SequentialFile<Record, int> file("datos4.dat", "auxiliar4.dat",
-                []( Record const&a, Record const&b) { return a.ciclo < b.ciclo;},
-                []( Record const&a,  Record const&b) { return a.ciclo > b.ciclo;},
-                []( Record const&a,  Record const&b) { return a.ciclo == b.ciclo;},
-                []( Record const&a,  int const&b) { return a.ciclo == b;},
-                []( Record const&a,  int const&b) { return a.ciclo < b;},
-                []( Record const&a,  int const&b) { return a.ciclo > b;}
+                []( Record const&a, Record const&b) { return a.player_id < b.player_id;},
+                []( Record const&a,  Record const&b) { return a.player_id > b.player_id;},
+                []( Record const&a,  Record const&b) { return a.player_id == b.player_id;},
+                []( Record const&a,  int const&b) { return a.player_id == b;},
+                []( Record const&a,  int const&b) { return a.player_id < b;},
+                []( Record const&a,  int const&b) { return a.player_id > b;}
                 );
 
 
     Record record;
-    record.setData(1, "Andres", "Perez", 1);
+    record.setData(1, "Abel", 100, 20, "Barcelona", "Espana");
     file.insert(record);
-    record.setData(2, "Carlos", "Perez", 3);
+    record.setData(2, "Beto", 200, 21, "Real Madrid", "Espana");
     file.insert(record);
-    record.setData(3, "Cintia", "Perez", 2);
-    file.insert(record);
-    record.setData(4, "Jorge", "Perez", 7);
-    file.insert(record);
-    record.setData(5, "Josimar", "Perez", 4);
-    file.insert(record);
-    record.setData(6, "Mabel", "Perez", 2);
-    file.insert(record);
-    record.setData(7, "Saulo", "Perez", 8);
-    file.insert(record);
-    record.setData(8, "Gabriel", "Perez", 9);
-    file.insert(record);
-    record.setData(9, "Gonzalo", "Perez", 6);
-    file.insert(record);
-    record.setData(10, "Maria", "Perez", 100);
-    file.insert(record);
-    record.setData(11, "Abel", "Perez", 12);
-    file.insert(record);
-
+    //seguir...
+    
     cout << "Datos.dat" << endl;
     fstream file1("datos.dat", ios::app | ios::in | ios::binary);
     Record cabecera;
@@ -66,7 +49,7 @@ int main() {
     Record current;
     file1.read((char *)&current, sizeof(current));
     while (!file1.eof()) {
-        cout << current.id << " " << current.name << " " << current.surname << " " << current.ciclo << " " << current.next << " " << current.archivo << endl;
+        current.showData();
         file1.read((char *)&current, sizeof(current));
     }
 
@@ -77,7 +60,7 @@ int main() {
     file2.seekg(0, ios::beg);
     file2.read((char *)&current, sizeof(current));
     while (!file2.eof()) {
-        cout << current.id << " " << current.name << " " << current.surname << " " << current.ciclo << " " << current.next << " " << current.archivo << endl;
+        current.showData();
         file2.read((char *)&current, sizeof(current));
     }
 

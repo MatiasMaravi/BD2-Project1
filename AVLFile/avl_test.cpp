@@ -1,4 +1,4 @@
-#include"avl_file.hpp"
+#include"avl_file_.hpp"
 
 template<class T, typename TK>
 void writeFile(AVLFile<T,TK>& file){
@@ -80,27 +80,23 @@ void test(AVLFile<T,TK>& file){
 
 int main(){
     //key = cod
-    // AVLFile<Record,int> file("data.dat",
-    //                 []( Record const&a, Record const&b) { return a.cod < b.cod;}, //less
-    //                 []( Record const&a, Record const&b) { return a.cod > b.cod;}, //greater
-    //                 []( Record const&a, int const&b) { return a.cod == b;}, //equal_key
-    //                 []( Record const&a, int const&b) { return a.cod < b;}, //less_key
-    //                 []( Record const&a, int const&b) { return a.cod > b;}, //greater_key
-    //                 []( Record const&a) { return a.cod;} //get_key
-    //                     );
+    AVLFile<Record,int> file2("data.dat",
+                    []( Record const&a, Record const&b) { return a.id < b.id;}, //less
+                    []( Record const&a, Record const&b) { return a.id > b.id;}, //greater
+                    []( Record const&a, int const&b) { return a.id == b;}, //equal_key
+                    []( Record const&a, int const&b) { return a.id < b;}, //less_key
+                    []( Record const&a, int const&b) { return a.id > b;}, //greater_key
+                    []( Record const&a) { return a.id;} //get_key
+                        );
     //key = name
-
-
-//
-//    AVLFile<Record,string> file("data.dat",
-//                    []( Record const&a, Record const&b) { return strcmp(a.nombre,b.nombre) < 0;}, //less
-//                    []( Record const&a, Record const&b) { return strcmp(a.nombre,b.nombre) > 0;}, //greater
-//                    []( Record const&a, string const&b) { return strcmp(a.nombre,b.c_str()) == 0;}, //equal_key
-//                    []( Record const&a, string const&b) { return strcmp(a.nombre,b.c_str()) < 0;}, //less_key
-//                    []( Record const&a, string const&b) { return strcmp(a.nombre,b.c_str()) > 0;}, //greater_key
-//                    []( Record const&a) { return a.nombre;} //get_key
-//                    );
-//    test(file);
-
+    AVLFile<Record,string> file("data.dat",
+                    []( Record const&a, Record const&b) { return strcmp(a.name,b.name) < 0;}, //less
+                    []( Record const&a, Record const&b) { return strcmp(a.name,b.name) > 0;}, //greater
+                    []( Record const&a, string const&b) { return strcmp(a.name,b.c_str()) == 0;}, //equal_key
+                    []( Record const&a, string const&b) { return strcmp(a.name,b.c_str()) < 0;}, //less_key
+                    []( Record const&a, string const&b) { return strcmp(a.name,b.c_str()) > 0;}, //greater_key
+                    []( Record const&a) { return a.name;} //get_key
+                    );
+    test(file);
     return 0;
 }
