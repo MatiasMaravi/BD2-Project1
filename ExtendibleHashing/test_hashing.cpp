@@ -18,50 +18,11 @@ unsigned long hash_string(const std::string& str) {
     
     return hash_int(hash);
 }
-template<typename T,typename TK>
-void cargar_hash(){
-    std::ifstream archivo("dataset.csv"); // Abre el archivo CSV
-    if (!archivo.is_open()) throw std::runtime_error("No se pudo abrir el archivo.");
-
-    std::string primeraLinea;
-    std::getline(archivo, primeraLinea);
 
 
-    std::string linea;
-
-    DynamicHash<T,TK> dh("buckets.dat","indices.dat");
-    
-    
-    // Leer el archivo línea por línea
-    while (std::getline(archivo, linea)) {
-        std::istringstream ss(linea);
-        std::string token;
-        std::vector<std::string> fila;
-        
-
-            while (std::getline(ss, token, ',')) {
-                // Verificar si el token está vacío o contiene solo comas
-                    fila.push_back(token);
-            }
-                Record r1;
-                r1.id=stoi(fila[0]);
-                strcpy(r1.name,fila[1].c_str());
-                r1.value=stoi(fila[2]);
-                r1.age=stoi(fila[3]);
-                strcpy(r1.fecha,fila[4].c_str());
-                strcpy(r1.nacionalidad,fila[8].c_str());
-                dh.add(r1);
-        
-    }
-
-    // Cerrar el archivo
-    archivo.close();
-
-
-}
 
 int main() {
-    std::ifstream archivo("../Dataset/datos_1000.csv"); // Abre el archivo CSV
+    std::ifstream archivo("../CSV/datos_10.csv"); // Abre el archivo CSV
     if (!archivo.is_open()) {
         std::cerr << "No se pudo abrir el archivo." << std::endl;
         return 1;
@@ -139,7 +100,8 @@ int main() {
     // dh.add(r1);
     cout<<"---------------------"<<endl;
     cout<<"Search"<<endl;
-    Record r100= dh.search("Juan");
+
+    Record r100= dh.search("S. Camara");
     r100.print();
     return 0;
 }
