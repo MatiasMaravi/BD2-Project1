@@ -9,7 +9,7 @@ Sentences:
 */
 
 #include "Scanner.hpp"
-#include "../sequential_file.hpp"
+#include "../SequentialFile/sequential_file.hpp"
 
 
 class Parser{

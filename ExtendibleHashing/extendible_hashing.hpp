@@ -5,7 +5,9 @@
 #include <string>
 #include<cstring>
 #include<functional>
+
 #include "Record_hash.h"
+
 using namespace std;
 unsigned long long D = 3;
 
@@ -28,10 +30,6 @@ string to_binary(int n){
     
     return binary_string;
 }
-
-
-
-
 
 struct IndexEntry{
     int pos_left;//0
@@ -130,6 +128,7 @@ class DynamicHash{
     function<TK(const T &)> get_key;
     function<unsigned long (const TK &)> hash_function;
     function<bool(const T &, const TK &)> equal_key;
+
     static DynamicHash<T, TK>* instance;
 
 
@@ -139,6 +138,7 @@ public:
                 function<unsigned long(const TK &)> hash_function, 
                 function<bool(const T &, const TK &)> equal_key,
                 int fb = 4);
+
 
     static DynamicHash<T, TK>& getInstance(string fileName_buckets, string fileName_index,
                                            function<TK(const T &)> get_key,
@@ -157,6 +157,7 @@ public:
 
     void aumentar_buckets(fstream &file, fstream &file2,int pos,int post_bucket,string binario,int &indice, T record);
 
+
     bool enlazar_bucket(fstream &file,int post_bucket,T record);
 
     bool add(fstream &file,int post_bucket,T record);
@@ -167,7 +168,9 @@ public:
 
     T search(fstream &file, fstream &file2, string binary, int &pos, int &indice, TK key);
 
+
     vector<T> search(TK key);
+
 
     bool remove(TK key);
 
@@ -175,9 +178,11 @@ public:
 };
 
 
+
 template <class T, typename TK>
 DynamicHash<T, TK>* DynamicHash<T, TK>::instance = nullptr;
 //Constructor
+
 
 
 template <class T, typename TK>
@@ -242,6 +247,7 @@ bool DynamicHash<T,TK>::add(T record){
 }
 template <class T, typename TK>
 void DynamicHash<T,TK>::aumentar_buckets(fstream &file, fstream &file2,int pos,int post_bucket,string binario,int &indice, T record){
+
     if(M<pow(2,D)){
         // Obtener bucket
         Bucket<T> bucket;
@@ -449,6 +455,7 @@ T DynamicHash<T,TK>::search(fstream &file, fstream &file2, string binary, int &p
 template <class T, typename TK>
 vector<T> DynamicHash<T,TK>::search(TK key){
     vector<T> final;
+
     string binary = to_binary(hash_function(key));//string binary = to_binary(hash_int(key));
     fstream file(fileName_buckets,ios::binary|ios::in|ios::out);
     fstream file2(fileName_index,ios::binary|ios::in|ios::out);

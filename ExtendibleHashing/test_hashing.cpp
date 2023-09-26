@@ -100,6 +100,7 @@ int main() {
     // dh.add(r1);
     cout<<"---------------------"<<endl;
     cout<<"Search"<<endl;
+
     Record r100= dh.search("S. Camara");
     r100.print();
     return 0;
