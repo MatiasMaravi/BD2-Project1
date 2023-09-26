@@ -65,13 +65,18 @@ Este algoritmo es sencillo de entender. Simplemente verificamos si el registro a
 ##### Caso 1:
 Cuando el registro a insertar es el "mayor" (con respecto a la llave primaria) a todos los demás.
 <p align="center">
-  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/SeqFile_img/SF1.png" height="400"/>
+
+![image](Imagenes/SeqFile_img/SF1.png)
+  
 </p>
+
+
 
 ##### Caso 2:
 Cuando el registro a insertar se encuentra entre dos registros.
 <p align="center">
-  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/SeqFile_img/SF2.png" height="400"/>
+
+ ![image](Imagenes/SeqFile_img/SF2.png)
 </p>
 
 Además, cuando se alcance el máximo de registros permitidos en el "archivo auxiliar", este procederá a realizar la reorganización.
@@ -79,7 +84,9 @@ Además, cuando se alcance el máximo de registros permitidos en el "archivo aux
 #### Eliminación:
 Este algoritmo se encarga de dos cosas. En primer lugar, hallará el valor a eliminar para obtener su predecesor y sucesor. En segundo lugar, será capaz de actualizar el puntero del registro a eliminar con el valor "-1a" ya que este puntero nunca se utiliza.
 <p align="center">
-  <img src="https://github.com/MatiasMaravi/BD2-Project1/blob/main/Imagenes/SeqFile_img/SF3.png" height="400"/>
+
+![image](Imagenes/SeqFile_img/SF3.png)
+
 </p>
 
 #### Búsqueda:
